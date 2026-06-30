@@ -1,0 +1,122 @@
+{
+  "_comment": "Each key must exactly match a meal name in meals.json. 'ingredients' is a list of strings. 'instructions' is a short method.",
+  "recipes": {
+    "Spaghetti Bolognese": {
+      "ingredients": [
+        "250g spaghetti",
+        "400g beef mince",
+        "1 onion, diced",
+        "2 garlic cloves, crushed",
+        "400g tinned tomatoes",
+        "2 tbsp tomato puree",
+        "1 carrot, diced",
+        "Parmesan, to serve"
+      ],
+      "instructions": "Brown the mince, soften the onion, carrot and garlic, add tomatoes and puree, simmer 20 mins. Serve over cooked spaghetti with parmesan."
+    },
+    "Chicken Curry": {
+      "ingredients": [
+        "2 chicken breasts, cubed",
+        "1 onion, sliced",
+        "2 tbsp curry powder",
+        "400ml coconut milk",
+        "200g basmati rice",
+        "1 tbsp ginger, grated",
+        "2 garlic cloves, crushed",
+        "Fresh coriander"
+      ],
+      "instructions": "Fry onion, garlic and ginger, add curry powder, then chicken. Pour in coconut milk and simmer 15 mins. Serve with rice and coriander."
+    },
+    "Veggie Stir Fry": {
+      "ingredients": [
+        "1 block firm tofu, cubed",
+        "1 pepper, sliced",
+        "1 broccoli head, florets",
+        "1 carrot, julienned",
+        "3 tbsp soy sauce",
+        "1 tbsp sesame oil",
+        "200g noodles",
+        "1 tbsp sesame seeds"
+      ],
+      "instructions": "Fry tofu until golden, set aside. Stir fry vegetables, add tofu, soy sauce and sesame oil. Toss with cooked noodles and sesame seeds."
+    },
+    "Beef Tacos": {
+      "ingredients": [
+        "400g beef mince",
+        "1 sachet taco seasoning",
+        "8 taco shells",
+        "1 lettuce, shredded",
+        "100g cheddar, grated",
+        "2 tomatoes, diced",
+        "Sour cream"
+      ],
+      "instructions": "Brown mince with taco seasoning and a splash of water. Fill taco shells with mince, lettuce, tomato, cheese and sour cream."
+    },
+    "Salmon & Roast Veg": {
+      "ingredients": [
+        "2 salmon fillets",
+        "1 sweet potato, chopped",
+        "1 courgette, sliced",
+        "1 red onion, wedged",
+        "2 tbsp olive oil",
+        "1 lemon"
+      ],
+      "instructions": "Toss vegetables in oil, roast 20 mins at 200C. Add salmon for the final 12 mins. Squeeze lemon over before serving."
+    },
+    "Mushroom Risotto": {
+      "ingredients": [
+        "250g arborio rice",
+        "300g mushrooms, sliced",
+        "1 onion, diced",
+        "1L vegetable stock",
+        "100ml white wine",
+        "50g parmesan",
+        "1 knob butter"
+      ],
+      "instructions": "Soften onion and mushrooms, add rice and wine, then add stock gradually, stirring, until creamy. Stir through butter and parmesan."
+    },
+    "Lentil Soup": {
+      "ingredients": [
+        "200g red lentils",
+        "1 onion, diced",
+        "2 carrots, diced",
+        "2 celery sticks, diced",
+        "1L vegetable stock",
+        "1 tsp cumin",
+        "1 tin chopped tomatoes"
+      ],
+      "instructions": "Saute onion, carrot and celery, add lentils, cumin, tomatoes and stock. Simmer 25 mins until lentils are soft, then blend if desired."
+    },
+    "Chicken Caesar Salad": {
+      "ingredients": [
+        "2 chicken breasts",
+        "1 romaine lettuce",
+        "40g parmesan, shaved",
+        "Croutons",
+        "3 tbsp caesar dressing"
+      ],
+      "instructions": "Grill or pan-fry chicken until cooked, slice. Toss lettuce with dressing, top with chicken, parmesan and croutons."
+    },
+    "Sausage & Mash": {
+      "ingredients": [
+        "6 sausages",
+        "800g potatoes",
+        "50g butter",
+        "100ml milk",
+        "1 onion, sliced",
+        "300ml beef gravy"
+      ],
+      "instructions": "Grill sausages until browned. Boil and mash potatoes with butter and milk. Fry onions and stir through gravy. Serve together."
+    },
+    "Margherita Pizza": {
+      "ingredients": [
+        "1 pizza base",
+        "100g tomato passata",
+        "125g mozzarella",
+        "Fresh basil leaves",
+        "1 tbsp olive oil"
+      ],
+      "instructions": "Spread passata over the base, tear over mozzarella, drizzle with oil and bake at 220C for 10-12 mins. Top with fresh basil."
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "_comment": "Add or remove meal names here. Every name MUST exactly match a key in recipes.json and costs.json, or it will show as missing data on the results page.",
+  "meals": [
+    "Spaghetti Bolognese",
+    "Chicken Curry",
+    "Veggie Stir Fry",
+    "Beef Tacos",
+    "Salmon & Roast Veg",
+    "Mushroom Risotto",
+    "Lentil Soup",
+    "Chicken Caesar Salad",
+    "Sausage & Mash",
+    "Margherita Pizza"
+  ]
+}

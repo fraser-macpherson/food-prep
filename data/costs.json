@@ -1,0 +1,16 @@
+{
+  "_comment": "Each key must exactly match a meal name in meals.json. Values are the cost of that meal in pounds (numbers only, no currency symbol).",
+  "currency": "GBP",
+  "costs": {
+    "Spaghetti Bolognese": 4.80,
+    "Chicken Curry": 5.60,
+    "Veggie Stir Fry": 3.90,
+    "Beef Tacos": 6.20,
+    "Salmon & Roast Veg": 7.50,
+    "Mushroom Risotto": 4.40,
+    "Lentil Soup": 2.70,
+    "Chicken Caesar Salad": 5.10,
+    "Sausage & Mash": 4.20,
+    "Margherita Pizza": 3.60
+  }
+}
