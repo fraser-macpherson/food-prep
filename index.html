@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekly Meal Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===========================================================
+   Weekly Meal Plan — tokens
+   Subject: a kitchen noticeboard. Day picks live on index cards,
+   the week's shop prints out like a till receipt.
+=========================================================== */
+:root {
+  --bg: #EEF1E2;
+  --card: #FFFCF5;
+  --ink: #233224;
+  --ink-soft: #5C6B57;
+  --line: #CBD2B8;
+  --terracotta: #C1622E;
+  --terracotta-dark: #9C4C20;
+  --mustard: #D9A441;
+  --sage-deep: #4B6358;
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+
+  --radius: 14px;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(35,50,36,0.07) 1px, transparent 0);
+  background-size: 22px 22px;
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+/* ---------- Focus & motion ---------- */
+a:focus-visible,
+button:focus-visible,
+select:focus-visible {
+  outline: 3px solid var(--terracotta);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+  html { scroll-behavior: auto; }
+}
+
+/* ---------- Header ---------- */
+.site-header {
+  margin-bottom: 40px;
+  max-width: 640px;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.75rem;
+  color: var(--terracotta-dark);
+  margin: 0 0 10px;
+  font-weight: 600;
+}
+
+.site-header h1 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2.2rem, 5vw, 3.2rem);
+  line-height: 1.05;
+  margin: 0 0 14px;
+  color: var(--ink);
+}
+
+.subhead {
+  font-size: 1.05rem;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+/* ---------- View toggling ---------- */
+.view[hidden] { display: none; }
+
+/* ---------- Card rack (day cards / daily breakdown) ---------- */
+.card-rack {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 18px;
+  margin-bottom: 32px;
+}
+
+.day-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px 16px 20px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 1px 0 rgba(35,50,36,0.04);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.day-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 18px -10px rgba(35,50,36,0.25);
+}
+
+.day-card::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--mustard);
+  box-shadow: 0 0 0 3px var(--bg);
+}
+
+.day-card .day-label {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  color: var(--sage-deep);
+}
+
+.day-select {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--ink);
+  background: #fff;
+  border: 1.5px solid var(--line);
+  border-radius: 9px;
+  padding: 10px 10px;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--ink-soft) 50%),
+                     linear-gradient(135deg, var(--ink-soft) 50%, transparent 50%);
+  background-position: calc(100% - 16px) calc(1em + 2px), calc(100% - 11px) calc(1em + 2px);
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+
+.day-select:focus {
+  border-color: var(--terracotta);
+}
+
+/* ---------- Planner actions ---------- */
+.planner-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.status-text {
+  font-size: 0.9rem;
+  color: var(--terracotta-dark);
+  margin: 0;
+  min-height: 1.2em;
+}
+
+.stamp-btn {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #fff;
+  background: var(--terracotta);
+  border: none;
+  border-radius: 999px;
+  padding: 14px 32px;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: transform 0.12s ease, background 0.12s ease;
+  box-shadow: 0 6px 0 var(--terracotta-dark);
+}
+
+.stamp-btn:hover { background: #B0592A; }
+.stamp-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 var(--terracotta-dark);
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--sage-deep);
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 4px;
+}
+
+/* ---------- Results heading ---------- */
+.results-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+.results-heading h2 {
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  margin: 0;
+}
+
+/* ---------- Daily breakdown cards ---------- */
+.recipe-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.recipe-card .day-label {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  color: var(--sage-deep);
+}
+
+.recipe-card .meal-name {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--ink);
+}
+
+.recipe-card .meal-cost {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--terracotta-dark);
+  font-weight: 600;
+}
+
+.recipe-card .meal-instructions {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+.recipe-card .ingredient-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.82rem;
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.recipe-card .missing-note {
+  font-size: 0.82rem;
+  color: var(--terracotta-dark);
+  font-style: italic;
+}
+
+.recipe-card.empty-day {
+  opacity: 0.6;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* ---------- Receipt (weekly summary) ---------- */
+.receipt-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.receipt {
+  width: 100%;
+  max-width: 420px;
+  background: #FFFEFA;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 28px 26px 26px;
+  font-family: var(--font-mono);
+  color: var(--ink);
+  position: relative;
+  box-shadow: 0 14px 28px -16px rgba(35,50,36,0.35);
+}
+
+.receipt::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -9px;
+  height: 18px;
+  background:
+    linear-gradient(135deg, #FFFEFA 50%, transparent 50%) 0 0,
+    linear-gradient(45deg, #FFFEFA 50%, transparent 50%) 0 0;
+  background-size: 16px 18px;
+  background-repeat: repeat-x;
+}
+
+.receipt h3 {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.8rem;
+  text-align: center;
+  margin: 0 0 4px;
+}
+
+.receipt .receipt-sub {
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--ink-soft);
+  margin: 0 0 16px;
+}
+
+.receipt-divider {
+  border: none;
+  border-top: 1px dashed var(--line);
+  margin: 14px 0;
+}
+
+.receipt-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.82rem;
+  padding: 3px 0;
+}
+
+.receipt-line .label { color: var(--ink); }
+.receipt-line .value { color: var(--ink-soft); white-space: nowrap; }
+
+.receipt-section-title {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--sage-deep);
+  margin: 16px 0 6px;
+}
+
+.receipt-ingredients {
+  font-size: 0.8rem;
+  line-height: 1.7;
+  color: var(--ink);
+}
+
+.receipt-total {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 2px solid var(--ink);
+}
+
+.receipt-total .value { color: var(--terracotta-dark); }
+
+/* ---------- Footer ---------- */
+.site-footer {
+  margin-top: 56px;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+.site-footer code {
+  font-family: var(--font-mono);
+  background: rgba(35,50,36,0.07);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 600px) {
+  .page { padding: 32px 16px 60px; }
+  .card-rack { grid-template-columns: repeat(2, 1fr); }
+  .stamp-btn { width: 100%; }
+  .planner-actions { flex-direction: column; align-items: stretch; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <header class="site-header">
+    <p class="eyebrow">Mon &mdash; Sun</p>
+    <h1>What's for dinner<br>this week?</h1>
+    <p class="subhead">Pick a meal for each day, then plan your shop in one go.</p>
+  </header>
+
+  <!-- ============ PLANNER ============ -->
+  <section id="planner-view" class="view">
+    <div class="card-rack" id="day-cards">
+      <!-- day cards injected by app.js -->
+    </div>
+
+    <div class="planner-actions">
+      <p id="planner-status" class="status-text" aria-live="polite"></p>
+      <button id="submit-btn" class="stamp-btn" type="button">Plan my week</button>
+    </div>
+  </section>
+
+  <!-- ============ RESULTS ============ -->
+  <section id="results-view" class="view" hidden>
+
+    <div class="results-heading">
+      <h2>Your week, planned</h2>
+      <button id="edit-btn" class="link-btn" type="button">&larr; Edit selections</button>
+    </div>
+
+    <div class="card-rack" id="daily-breakdown">
+      <!-- daily recipe cards injected by app.js -->
+    </div>
+
+    <div class="receipt-wrap">
+      <div class="receipt" id="weekly-summary">
+        <!-- receipt content injected by app.js -->
+      </div>
+    </div>
+
+  </section>
+
+  <footer class="site-footer">
+    <p>Meals, recipes and costs are loaded from <code>data/meals.json</code>, <code>data/recipes.json</code> and <code>data/costs.json</code> &mdash; edit those files to change what's on offer.</p>
+  </footer>
+
+</div>
+
+<script>
+/* ===========================================================
+   Weekly Meal Plan — app logic
+   Loads data/meals.json, data/recipes.json, data/costs.json
+   and drives the day-picker -> results flow.
+=========================================================== */
+
+const DAYS = [
+  { key: "MON", label: "Mon" },
+  { key: "TUE", label: "Tue" },
+  { key: "WED", label: "Wed" },
+  { key: "THU", label: "Thu" },
+  { key: "FRI", label: "Fri" },
+  { key: "SAT", label: "Sat" },
+  { key: "SUN", label: "Sun" },
+];
+
+const state = {
+  meals: [],
+  recipes: {},
+  costs: {},
+  currency: "GBP",
+};
+
+const CURRENCY_SYMBOLS = { GBP: "£", USD: "$", EUR: "€" };
+
+function currencySymbol() {
+  return CURRENCY_SYMBOLS[state.currency] || "";
+}
+
+function formatMoney(amount) {
+  if (typeof amount !== "number" || isNaN(amount)) return "—";
+  return `${currencySymbol()}${amount.toFixed(2)}`;
+}
+
+/* ---------- Data loading ---------- */
+
+async function loadData() {
+  const status = document.getElementById("planner-status");
+  try {
+    const [mealsRes, recipesRes, costsRes] = await Promise.all([
+      fetch("data/meals.json", { cache: "no-store" }),
+      fetch("data/recipes.json", { cache: "no-store" }),
+      fetch("data/costs.json", { cache: "no-store" }),
+    ]);
+
+    if (!mealsRes.ok || !recipesRes.ok || !costsRes.ok) {
+      throw new Error("One or more data files could not be loaded.");
+    }
+
+    const mealsJson = await mealsRes.json();
+    const recipesJson = await recipesRes.json();
+    const costsJson = await costsRes.json();
+
+    state.meals = Array.isArray(mealsJson.meals) ? mealsJson.meals : [];
+    state.recipes = recipesJson.recipes || {};
+    state.costs = costsJson.costs || {};
+    state.currency = costsJson.currency || "GBP";
+
+    if (state.meals.length === 0) {
+      status.textContent = "No meals found in data/meals.json — add some meal names to get started.";
+    }
+  } catch (err) {
+    console.error(err);
+    status.textContent =
+      "Couldn't load the meal data. If you're opening this file directly from disk, " +
+      "serve it through a local server (or GitHub Pages) instead — browsers block " +
+      "local file loading for security reasons.";
+  }
+}
+
+/* ---------- Planner view ---------- */
+
+function buildDayCards() {
+  const rack = document.getElementById("day-cards");
+  rack.innerHTML = "";
+
+  DAYS.forEach((day) => {
+    const card = document.createElement("div");
+    card.className = "day-card";
+
+    const label = document.createElement("div");
+    label.className = "day-label";
+    label.textContent = day.label;
+
+    const select = document.createElement("select");
+    select.className = "day-select";
+    select.id = `select-${day.key}`;
+    select.setAttribute("aria-label", `Meal for ${day.label}`);
+
+    const blankOpt = document.createElement("option");
+    blankOpt.value = "";
+    blankOpt.textContent = "No meal";
+    select.appendChild(blankOpt);
+
+    state.meals.forEach((meal) => {
+      const opt = document.createElement("option");
+      opt.value = meal;
+      opt.textContent = meal;
+      select.appendChild(opt);
+    });
+
+    card.appendChild(label);
+    card.appendChild(select);
+    rack.appendChild(card);
+  });
+}
+
+function getSelections() {
+  return DAYS.map((day) => {
+    const select = document.getElementById(`select-${day.key}`);
+    return { key: day.key, label: day.label, meal: select ? select.value : "" };
+  });
+}
+
+/* ---------- Results view ---------- */
+
+function buildResults() {
+  const selections = getSelections();
+  const chosen = selections.filter((s) => s.meal);
+  const status = document.getElementById("planner-status");
+
+  if (chosen.length === 0) {
+    status.textContent = "Pick at least one meal before planning your week.";
+    return;
+  }
+  status.textContent = "";
+
+  renderDailyBreakdown(selections);
+  renderWeeklySummary(chosen);
+
+  document.getElementById("planner-view").hidden = true;
+  document.getElementById("results-view").hidden = false;
+  document.getElementById("results-view").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function renderDailyBreakdown(selections) {
+  const rack = document.getElementById("daily-breakdown");
+  rack.innerHTML = "";
+
+  selections.forEach((sel) => {
+    const card = document.createElement("div");
+    card.className = "recipe-card";
+
+    if (!sel.meal) {
+      card.classList.add("empty-day");
+      card.innerHTML = `
+        <div class="day-label">${sel.label}</div>
+        <p class="missing-note">No meal selected</p>
+      `;
+      rack.appendChild(card);
+      return;
+    }
+
+    const recipe = state.recipes[sel.meal];
+    const cost = state.costs[sel.meal];
+
+    let ingredientsHtml = "";
+    let instructionsHtml = "";
+    let missingHtml = "";
+
+    if (recipe) {
+      const ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
+      ingredientsHtml = `<ul class="ingredient-list">${ingredients
+        .map((i) => `<li>${escapeHtml(i)}</li>`)
+        .join("")}</ul>`;
+      if (recipe.instructions) {
+        instructionsHtml = `<p class="meal-instructions">${escapeHtml(recipe.instructions)}</p>`;
+      }
+    } else {
+      missingHtml += `<p class="missing-note">No recipe found for this meal.</p>`;
+    }
+
+    if (typeof cost !== "number") {
+      missingHtml += `<p class="missing-note">No cost found for this meal.</p>`;
+    }
+
+    card.innerHTML = `
+      <div class="day-label">${sel.label}</div>
+      <h3 class="meal-name">${escapeHtml(sel.meal)}</h3>
+      <div class="meal-cost">${formatMoney(cost)}</div>
+      ${instructionsHtml}
+      ${ingredientsHtml}
+      ${missingHtml}
+    `;
+    rack.appendChild(card);
+  });
+}
+
+function renderWeeklySummary(chosen) {
+  const receipt = document.getElementById("weekly-summary");
+
+  // Combine ingredients, tallying exact-text duplicates.
+  const ingredientTally = new Map();
+  let totalCost = 0;
+  let missingCostCount = 0;
+
+  chosen.forEach((sel) => {
+    const recipe = state.recipes[sel.meal];
+    const cost = state.costs[sel.meal];
+
+    if (typeof cost === "number") {
+      totalCost += cost;
+    } else {
+      missingCostCount += 1;
+    }
+
+    if (recipe && Array.isArray(recipe.ingredients)) {
+      recipe.ingredients.forEach((ing) => {
+        ingredientTally.set(ing, (ingredientTally.get(ing) || 0) + 1);
+      });
+    }
+  });
+
+  const mealLines = chosen
+    .map(
+      (sel) => `
+      <div class="receipt-line">
+        <span class="label">${sel.label} &mdash; ${escapeHtml(sel.meal)}</span>
+        <span class="value">${formatMoney(state.costs[sel.meal])}</span>
+      </div>`
+    )
+    .join("");
+
+  const ingredientLines = Array.from(ingredientTally.entries())
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([name, count]) => `${escapeHtml(name)}${count > 1 ? ` (x${count})` : ""}`)
+    .join("<br>");
+
+  const missingNote =
+    missingCostCount > 0
+      ? `<p class="missing-note">${missingCostCount} meal(s) missing a cost — total may be incomplete.</p>`
+      : "";
+
+  receipt.innerHTML = `
+    <h3>Weekly Shop</h3>
+    <p class="receipt-sub">${chosen.length} meal${chosen.length === 1 ? "" : "s"} planned</p>
+
+    <div class="receipt-section-title">Meals</div>
+    ${mealLines}
+
+    <hr class="receipt-divider">
+
+    <div class="receipt-section-title">Combined ingredients</div>
+    <div class="receipt-ingredients">${ingredientLines || "No ingredient data available."}</div>
+
+    ${missingNote}
+
+    <div class="receipt-total">
+      <span>Total</span>
+      <span class="value">${formatMoney(totalCost)}</span>
+    </div>
+  `;
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+/* ---------- Wiring ---------- */
+
+function showPlanner() {
+  document.getElementById("results-view").hidden = true;
+  document.getElementById("planner-view").hidden = false;
+  document.getElementById("planner-view").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  await loadData();
+  buildDayCards();
+
+  document.getElementById("submit-btn").addEventListener("click", buildResults);
+  document.getElementById("edit-btn").addEventListener("click", showPlanner);
+});
+
+</script>
+</body>
+</html>
