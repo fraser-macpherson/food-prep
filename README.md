@@ -2,17 +2,19 @@
 
 A simple, good-looking website for picking a meal for each day of the week, then
 seeing the recipes, ingredients, and total cost for the whole week's shop.
+Vegetarian meals are marked with a green asterisk (*) throughout.
 
 ## Files
 
 - `index.html` — the planner: markup, styling, and behaviour all live in this
   one file, so there are no separate CSS/JS paths that can go missing when
   uploading.
-- `add.html` — a password-gated page for adding new meals (recipe +
-  ingredients + cost) without hand-editing the JSON files. Also fully
-  self-contained.
+- `add.html` — a password-gated page for putting together a request for a
+  new meal (recipe + ingredients + cost + vegetarian or not) without
+  hand-editing the JSON files. Also fully self-contained.
 - `data/meals.json` — the list of meals offered in every day's dropdown.
-- `data/recipes.json` — ingredients + a short method for each meal.
+- `data/recipes.json` — ingredients, a short method, and a vegetarian
+  true/false flag for each meal.
 - `data/costs.json` — the price of each meal.
 - `.nojekyll` — tells GitHub Pages to serve the files as-is, without running
   them through Jekyll first. Keep this file even though it looks empty.
@@ -23,13 +25,32 @@ appears as a key in `recipes.json` and `costs.json`. If a name is missing
 from one of the other files, the site still works — it just shows "No
 recipe found" or "No cost found" for that meal instead of breaking.
 
-## Adding new meals through the website
+## Vegetarian marker
+
+Any meal can be flagged as vegetarian by setting `"vegetarian": true` on its
+entry in `data/recipes.json` (see the format below). Where this is `true`,
+the site shows a green asterisk (`*`) next to the meal name:
+
+- In each day's dropdown on the planner (shown as plain text there, since
+  browsers don't reliably support colouring inside dropdown lists — but the
+  meal name itself is tinted green where the browser allows it).
+- On the meal name in each day's recipe card after you plan the week.
+- Next to the meal in the "Meals" list on the weekly shop receipt.
+- Next to the meal name in the "In this request so far" list on the Add
+  options page.
+
+A short legend ("* Vegetarian meal") sits under the heading on the planner
+page as a key. Meals with no `vegetarian` field, or with it set to `false`,
+are treated as non-vegetarian and shown with no marker — nothing breaks if
+the field is left out of an older entry.
+
+## Requesting new meals through the website
 
 `add.html` (linked from the nav bar and footer as **Add options**) gives you
-a form for adding a meal, its recipe, and its cost in one go, with built-in
-validation:
+a form for putting together a request for a new meal — its recipe,
+ingredients, cost, and whether it's vegetarian — with built-in validation:
 
-- **Admin password** — required, and masked as you type. The page checks it
+- **Shared password** — required, and masked as you type. The page checks it
   against a stored hash rather than a plain-text value.
 - **Meal name** — required, and checked against the meals already loaded so
   you can't accidentally create a duplicate.
@@ -37,15 +58,27 @@ validation:
   ingredient is required.
 - **Method** — required.
 - **Cost** — required, must be a number greater than 0.
+- **Vegetarian** — an optional checkbox; leave it unchecked if the meal isn't
+  vegetarian.
 
-Important: **GitHub Pages only serves static files — it can't run server
-code, so this page can't write to your repository for you.** After a
-successful submit, it shows you the fully updated contents of `meals.json`,
-`recipes.json`, and `costs.json` (your existing data plus the new meal,
-correctly cross-linked across all three). Copy or download each one and
-replace the matching file in your repository, then commit. You can add
-several meals in one sitting before you go and commit — each addition
-builds on the last within that browser session.
+After a successful submit, the page shows the fully updated contents of
+`meals.json`, `recipes.json`, and `costs.json` (the existing data plus the
+new meal, correctly cross-linked across all three, including the vegetarian
+flag). Copy or download each part and send it to whoever manages the site so
+they can add it — the page itself only prepares the request, it doesn't
+publish anything on its own. You can add several meals to one request before
+sending anything — each addition builds on the last within that browser
+session.
+
+### Why requests aren't published automatically
+
+This is a note for whoever maintains the site — it's deliberately left off
+the page itself to keep things simple for anyone filling in a request.
+GitHub Pages only serves static files; it can't run server code or write to
+your repository. That's why `add.html` can only prepare a correctly
+formatted request rather than publish it — you (or whoever has repo access)
+still need to take the copied or downloaded JSON and commit it to `data/` to
+make a requested meal live.
 
 ### About the password
 
@@ -98,13 +131,16 @@ appear in each dropdown.
   "recipes": {
     "Spaghetti Bolognese": {
       "ingredients": ["250g spaghetti", "400g beef mince"],
-      "instructions": "Brown the mince, add tomatoes, simmer, serve over pasta."
+      "instructions": "Brown the mince, add tomatoes, simmer, serve over pasta.",
+      "vegetarian": false
     }
   }
 }
 ```
 The key (`"Spaghetti Bolognese"`) must match a name in `meals.json` exactly,
-including capitalisation.
+including capitalisation. Set `"vegetarian"` to `true` to show the green
+asterisk marker next to that meal around the site, or `false` (or leave it
+out) if it isn't vegetarian.
 
 ### `data/costs.json`
 ```json

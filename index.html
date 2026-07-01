@@ -28,6 +28,7 @@
   --success-bg: #E9F2EC;
   --success-line: #BFDFCB;
   --sage-deep: #4B6358;
+  --veg-green: #2E7D46;
 
   --font-display: 'Fraunces', Georgia, serif;
   --font-body: 'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -152,6 +153,21 @@ textarea:focus-visible {
   margin: 0;
 }
 
+/* ---------- Vegetarian marker ---------- */
+.veg-marker {
+  color: var(--veg-green);
+  font-weight: 700;
+  margin-left: 2px;
+}
+
+.veg-legend {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  margin: 10px 0 0;
+}
+
+.veg-legend .veg-marker { font-size: 0.95rem; }
+
 /* ---------- View toggling ---------- */
 .view[hidden] { display: none; }
 
@@ -209,6 +225,11 @@ textarea:focus-visible {
 
 .day-select:focus {
   border-color: var(--accent);
+}
+
+.day-select option.veg-option {
+  color: var(--veg-green);
+  font-weight: 600;
 }
 
 /* ---------- Planner actions ---------- */
@@ -525,6 +546,30 @@ textarea:focus-visible {
   border-color: var(--error);
 }
 
+.checkbox-field {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.checkbox-field input[type="checkbox"] {
+  width: 19px;
+  height: 19px;
+  accent-color: var(--veg-green);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.checkbox-field label {
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--ink);
+  cursor: pointer;
+}
+
 .ingredient-row {
   display: flex;
   gap: 8px;
@@ -740,8 +785,7 @@ textarea:focus-visible {
   .planner-actions { flex-direction: column; align-items: stretch; }
   .form-card { padding: 20px; }
   .site-footer { flex-direction: column; }
-}
-</style>
+}</style>
 </head>
 <body>
 
@@ -759,6 +803,7 @@ textarea:focus-visible {
     <p class="eyebrow">Mon &mdash; Sun</p>
     <h1>What's for dinner<br>this week?</h1>
     <p class="subhead">Pick a meal for each day, then plan your shop in one go.</p>
+    <p class="veg-legend"><span class="veg-marker">*</span> Vegetarian meal</p>
   </header>
 
   <!-- ============ PLANNER ============ -->
@@ -794,7 +839,7 @@ textarea:focus-visible {
   </section>
 
   <footer class="site-footer">
-    <p>Meals, recipes and costs are loaded from <code>data/meals.json</code>, <code>data/recipes.json</code> and <code>data/costs.json</code>. Have the admin password? Use <a href="add.html">Add options</a> to add a new meal without editing the files by hand.</p>
+    <p>Want to see a new meal added to the list? Head to <a href="add.html">Add options</a>, fill in the form, and send what it gives you to whoever manages this site to request the addition.</p>
     <div class="footer-links">
       <a href="add.html">Add options &rarr;</a>
     </div>
@@ -837,6 +882,15 @@ function formatMoney(amount) {
   return `${currencySymbol()}${amount.toFixed(2)}`;
 }
 
+function isVegetarian(mealName) {
+  const recipe = state.recipes[mealName];
+  return !!(recipe && recipe.vegetarian === true);
+}
+
+function vegMarkerHtml() {
+  return `<span class="veg-marker" title="Vegetarian">*</span>`;
+}
+
 /* ---------- Data loading ---------- */
 
 async function loadData() {
@@ -868,7 +922,7 @@ async function loadData() {
     console.error(err);
     status.textContent =
       "Couldn't load the meal data. If you're opening this file directly from disk, " +
-      "serve it through a local server (or GitHub Pages) instead — browsers block " +
+      "try opening it from the website's live address instead — browsers block " +
       "local file loading for security reasons.";
   }
 }
@@ -900,7 +954,8 @@ function buildDayCards() {
     state.meals.forEach((meal) => {
       const opt = document.createElement("option");
       opt.value = meal;
-      opt.textContent = meal;
+      opt.textContent = isVegetarian(meal) ? `${meal} *` : meal;
+      if (isVegetarian(meal)) opt.className = "veg-option";
       select.appendChild(opt);
     });
 
@@ -981,7 +1036,7 @@ function renderDailyBreakdown(selections) {
 
     card.innerHTML = `
       <div class="day-label">${sel.label}</div>
-      <h3 class="meal-name">${escapeHtml(sel.meal)}</h3>
+      <h3 class="meal-name">${escapeHtml(sel.meal)}${isVegetarian(sel.meal) ? vegMarkerHtml() : ""}</h3>
       <div class="meal-cost">${formatMoney(cost)}</div>
       ${instructionsHtml}
       ${ingredientsHtml}
@@ -1020,7 +1075,7 @@ function renderWeeklySummary(chosen) {
     .map(
       (sel) => `
       <div class="receipt-line">
-        <span class="label">${sel.label} &mdash; ${escapeHtml(sel.meal)}</span>
+        <span class="label">${sel.label} &mdash; ${escapeHtml(sel.meal)}${isVegetarian(sel.meal) ? vegMarkerHtml() : ""}</span>
         <span class="value">${formatMoney(state.costs[sel.meal])}</span>
       </div>`
     )
@@ -1080,7 +1135,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("submit-btn").addEventListener("click", buildResults);
   document.getElementById("edit-btn").addEventListener("click", showPlanner);
 });
-
 </script>
 </body>
 </html>

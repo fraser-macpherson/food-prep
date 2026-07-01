@@ -28,6 +28,7 @@
   --success-bg: #E9F2EC;
   --success-line: #BFDFCB;
   --sage-deep: #4B6358;
+  --veg-green: #2E7D46;
 
   --font-display: 'Fraunces', Georgia, serif;
   --font-body: 'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -152,6 +153,21 @@ textarea:focus-visible {
   margin: 0;
 }
 
+/* ---------- Vegetarian marker ---------- */
+.veg-marker {
+  color: var(--veg-green);
+  font-weight: 700;
+  margin-left: 2px;
+}
+
+.veg-legend {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  margin: 10px 0 0;
+}
+
+.veg-legend .veg-marker { font-size: 0.95rem; }
+
 /* ---------- View toggling ---------- */
 .view[hidden] { display: none; }
 
@@ -209,6 +225,11 @@ textarea:focus-visible {
 
 .day-select:focus {
   border-color: var(--accent);
+}
+
+.day-select option.veg-option {
+  color: var(--veg-green);
+  font-weight: 600;
 }
 
 /* ---------- Planner actions ---------- */
@@ -525,6 +546,30 @@ textarea:focus-visible {
   border-color: var(--error);
 }
 
+.checkbox-field {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.checkbox-field input[type="checkbox"] {
+  width: 19px;
+  height: 19px;
+  accent-color: var(--veg-green);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.checkbox-field label {
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--ink);
+  cursor: pointer;
+}
+
 .ingredient-row {
   display: flex;
   gap: 8px;
@@ -740,9 +785,7 @@ textarea:focus-visible {
   .planner-actions { flex-direction: column; align-items: stretch; }
   .form-card { padding: 20px; }
   .site-footer { flex-direction: column; }
-}
-
-</style>
+}</style>
 </head>
 <body>
 
@@ -758,12 +801,12 @@ textarea:focus-visible {
 
   <header class="site-header">
     <p class="eyebrow">Admin</p>
-    <h1>Add a new meal</h1>
-    <p class="subhead">Add a meal, its recipe and its cost in one go. You'll need the admin password.</p>
+    <h1>Request a new meal</h1>
+    <p class="subhead">Put together everything needed for a new meal &mdash; its recipe, ingredients, cost and whether it's vegetarian. You'll need the shared password to continue.</p>
   </header>
 
   <div class="admin-note">
-    <strong>Before you start:</strong> this page can't write to your repository directly &mdash; GitHub Pages only serves static files, it can't run server code. Once you submit, you'll get ready-to-paste JSON for <code>meals.json</code>, <code>recipes.json</code> and <code>costs.json</code> below. Copy or download each one and commit it to your repository to make the change live. Treat the password as a basic deterrent rather than real security: this is a public static site, so anyone who looks at the page's source code could find a way around it.
+    <strong>How this works:</strong> fill in the form below to put together a request for a new meal. Once you submit, you'll get the details in the exact format needed to add it to the site. Copy or download that, then send it to whoever manages the Weekly Meal Plan so they can add it for you.
   </div>
 
   <form id="add-meal-form" class="form-card" novalidate>
@@ -773,7 +816,7 @@ textarea:focus-visible {
     <div id="form-banner-area"></div>
 
     <div class="field" id="field-password">
-      <label for="password">Admin password</label>
+      <label for="password">Shared password</label>
       <input type="password" id="password" name="password" autocomplete="off" required>
       <p class="field-error" id="error-password"></p>
     </div>
@@ -807,8 +850,13 @@ textarea:focus-visible {
       <p class="field-error" id="error-cost"></p>
     </div>
 
+    <div class="field checkbox-field" id="field-vegetarian">
+      <input type="checkbox" id="vegetarian" name="vegetarian">
+      <label for="vegetarian">This meal is vegetarian <span class="veg-marker" title="Vegetarian">*</span></label>
+    </div>
+
     <div class="form-actions">
-      <button type="submit" class="stamp-btn" id="add-meal-submit">Add meal</button>
+      <button type="submit" class="stamp-btn" id="add-meal-submit">Add to request</button>
       <button type="button" class="secondary-btn" id="reset-form-btn">Start over</button>
     </div>
   </form>
@@ -816,8 +864,8 @@ textarea:focus-visible {
   <p class="pending-list" id="pending-list" hidden></p>
 
   <section class="output-section" id="output-section" hidden>
-    <h2>Updated files</h2>
-    <p class="form-intro">Copy or download each file below and replace the matching file in your repository, then commit the change.</p>
+    <h2>Your request</h2>
+    <p class="form-intro">Copy or download each part below, then send them to whoever manages this site to request the addition.</p>
 
     <div class="output-block">
       <h4>data/meals.json</h4>
@@ -848,7 +896,7 @@ textarea:focus-visible {
   </section>
 
   <footer class="site-footer">
-    <p>Changes made here aren't live until you commit the downloaded files to your repository. Head back to <a href="index.html">Plan the week</a> to use the live planner.</p>
+    <p>This page only puts your request together &mdash; it isn't live until whoever manages this site adds it. Head back to <a href="index.html">Plan the week</a> to use the live planner.</p>
     <div class="footer-links">
       <a href="index.html">&larr; Plan the week</a>
     </div>
@@ -992,6 +1040,7 @@ async function validateForm() {
   const nameEl = document.getElementById("meal-name");
   const instructionsEl = document.getElementById("instructions");
   const costEl = document.getElementById("cost");
+  const vegetarianEl = document.getElementById("vegetarian");
 
   const password = passwordEl.value;
   const name = nameEl.value.trim();
@@ -1001,9 +1050,10 @@ async function validateForm() {
   const instructions = instructionsEl.value.trim();
   const costRaw = costEl.value;
   const cost = parseFloat(costRaw);
+  const vegetarian = vegetarianEl.checked;
 
   if (!password) {
-    setFieldError("field-password", "error-password", "Enter the admin password.");
+    setFieldError("field-password", "error-password", "Enter the shared password.");
     valid = false;
   } else {
     const hash = await sha256Hex(password);
@@ -1036,7 +1086,7 @@ async function validateForm() {
     valid = false;
   }
 
-  return { valid, name, ingredients, instructions, cost: Math.round(cost * 100) / 100 };
+  return { valid, name, ingredients, instructions, cost: Math.round(cost * 100) / 100, vegetarian };
 }
 
 /* ---------- Output rendering ---------- */
@@ -1055,9 +1105,13 @@ function renderPendingList() {
     return;
   }
   el.hidden = false;
-  el.innerHTML = `<strong>Added this session:</strong> ${pendingAdditions
-    .map((n) => n.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"))
-    .join(", ")}`;
+  const names = pendingAdditions
+    .map((item) => {
+      const safeName = item.name.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      return item.vegetarian ? `${safeName}<span class="veg-marker" title="Vegetarian">*</span>` : safeName;
+    })
+    .join(", ");
+  el.innerHTML = `<strong>In this request so far:</strong> ${names}`;
 }
 
 /* ---------- Form submit ---------- */
@@ -1082,18 +1136,20 @@ async function handleSubmit(e) {
   workingRecipes.recipes[result.name] = {
     ingredients: result.ingredients,
     instructions: result.instructions,
+    vegetarian: result.vegetarian,
   };
   workingCosts.costs[result.name] = result.cost;
-  pendingAdditions.push(result.name);
+  pendingAdditions.push({ name: result.name, vegetarian: result.vegetarian });
 
   renderOutputs();
   renderPendingList();
-  showBanner("success", `"${result.name}" was added below. Copy or download the files and commit them to make it live.`);
+  showBanner("success", `"${result.name}" was added to your request below. Copy or download it and send it to whoever manages the site to make it live.`);
 
   document.getElementById("meal-name").value = "";
   document.getElementById("instructions").value = "";
   document.getElementById("cost").value = "";
   document.getElementById("password").value = "";
+  document.getElementById("vegetarian").checked = false;
   resetIngredientRows();
   clearAllErrors();
 
@@ -1170,7 +1226,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error(err);
     showBanner(
       "error",
-      "Couldn't load the data files, so meals can't be added right now. If you're opening this file directly from disk, serve it through a local server (or GitHub Pages) instead."
+      "Couldn't load the data files, so a request can't be put together right now. If you're opening this file directly from disk, try opening it from the website's live address instead."
     );
     document.getElementById("add-meal-submit").disabled = true;
   }
@@ -1180,7 +1236,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("reset-form-btn").addEventListener("click", handleStartOver);
   document.getElementById("output-section").addEventListener("click", handleOutputClick);
 });
-
 </script>
 </body>
 </html>
