@@ -232,6 +232,20 @@ textarea:focus-visible {
   font-weight: 600;
 }
 
+.select-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.meal-type-label {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+}
+
 /* ---------- Planner actions ---------- */
 .planner-actions {
   display: flex;
@@ -366,6 +380,27 @@ textarea:focus-visible {
   text-align: center;
 }
 
+.recipe-card .meal-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.recipe-card .meal-block + .meal-block {
+  margin-top: 4px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--line);
+}
+
+.recipe-card .meal-type-label {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--sage-deep);
+}
+
 /* ---------- Receipt (weekly summary) ---------- */
 .receipt-wrap {
   display: flex;
@@ -430,6 +465,12 @@ textarea:focus-visible {
 .receipt-line .label { color: var(--ink); }
 .receipt-line .value { color: var(--ink-soft); white-space: nowrap; }
 
+.receipt-meal-type {
+  font-size: 0.68rem;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
 .receipt-section-title {
   font-size: 0.72rem;
   text-transform: uppercase;
@@ -442,6 +483,86 @@ textarea:focus-visible {
   font-size: 0.8rem;
   line-height: 1.7;
   color: var(--ink);
+}
+
+.extra-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.extra-item-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  padding: 3px 0;
+}
+
+.extra-item-name {
+  flex: 1;
+  color: var(--ink);
+}
+
+.extra-item-cost {
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.remove-extra-btn {
+  background: none;
+  border: none;
+  color: var(--ink-soft);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0 2px;
+}
+
+.remove-extra-btn:hover {
+  color: var(--error);
+}
+
+.extra-item-form {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.extra-item-input {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  padding: 7px 9px;
+  border: 1.5px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--ink);
+}
+
+.extra-item-cost-input {
+  width: 72px;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  padding: 7px 9px;
+  border: 1.5px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--ink);
+}
+
+.extra-item-input:focus,
+.extra-item-cost-input:focus {
+  border-color: var(--accent);
+}
+
+.extra-item-add-btn {
+  font-family: var(--font-body);
+  font-weight: 600;
+  padding: 7px 14px;
+  white-space: nowrap;
 }
 
 .receipt-total {
@@ -884,15 +1005,6 @@ textarea:focus-visible {
         <button class="tiny-btn" type="button" data-download="recipes.json" data-source="output-recipes">Download</button>
       </div>
     </div>
-
-    <div class="output-block">
-      <h4>data/costs.json</h4>
-      <pre class="code-box" id="output-costs"></pre>
-      <div class="output-actions">
-        <button class="tiny-btn" type="button" data-copy="output-costs">Copy</button>
-        <button class="tiny-btn" type="button" data-download="costs.json" data-source="output-costs">Download</button>
-      </div>
-    </div>
   </section>
 
   <footer class="site-footer">
@@ -907,8 +1019,9 @@ textarea:focus-visible {
 <script>
 /* ===========================================================
    Add Options — admin page logic
-   Loads the three data files, password-gates additions, validates
-   the form, then renders updated JSON ready to copy/download.
+   Loads meals.json and recipes.json (cost lives inside each recipe),
+   password-gates additions, validates the form, then renders updated
+   JSON ready to copy/download.
 =========================================================== */
 
 /* SHA-256 hash of the admin password — never store the plain password
@@ -925,7 +1038,6 @@ const CURRENCY_SYMBOLS = { GBP: "£", USD: "$", EUR: "€" };
 
 let workingMeals = null;
 let workingRecipes = null;
-let workingCosts = null;
 let pendingAdditions = [];
 
 /* ---------- Helpers ---------- */
@@ -972,26 +1084,23 @@ function clearBanner() {
 /* ---------- Data loading ---------- */
 
 async function loadData() {
-  const [mealsRes, recipesRes, costsRes] = await Promise.all([
+  const [mealsRes, recipesRes] = await Promise.all([
     fetch("data/meals.json", { cache: "no-store" }),
     fetch("data/recipes.json", { cache: "no-store" }),
-    fetch("data/costs.json", { cache: "no-store" }),
   ]);
 
-  if (!mealsRes.ok || !recipesRes.ok || !costsRes.ok) {
+  if (!mealsRes.ok || !recipesRes.ok) {
     throw new Error("One or more data files could not be loaded.");
   }
 
   workingMeals = await mealsRes.json();
   workingRecipes = await recipesRes.json();
-  workingCosts = await costsRes.json();
 
   if (!Array.isArray(workingMeals.meals)) workingMeals.meals = [];
   if (typeof workingRecipes.recipes !== "object" || !workingRecipes.recipes) workingRecipes.recipes = {};
-  if (typeof workingCosts.costs !== "object" || !workingCosts.costs) workingCosts.costs = {};
-  if (!workingCosts.currency) workingCosts.currency = "GBP";
+  if (!workingRecipes.currency) workingRecipes.currency = "GBP";
 
-  const symbol = CURRENCY_SYMBOLS[workingCosts.currency] || "";
+  const symbol = CURRENCY_SYMBOLS[workingRecipes.currency] || "";
   document.getElementById("currency-symbol").textContent = symbol;
 }
 
@@ -1094,7 +1203,6 @@ async function validateForm() {
 function renderOutputs() {
   document.getElementById("output-meals").textContent = JSON.stringify(workingMeals, null, 2);
   document.getElementById("output-recipes").textContent = JSON.stringify(workingRecipes, null, 2);
-  document.getElementById("output-costs").textContent = JSON.stringify(workingCosts, null, 2);
   document.getElementById("output-section").hidden = false;
 }
 
@@ -1137,8 +1245,8 @@ async function handleSubmit(e) {
     ingredients: result.ingredients,
     instructions: result.instructions,
     vegetarian: result.vegetarian,
+    cost: result.cost,
   };
-  workingCosts.costs[result.name] = result.cost;
   pendingAdditions.push({ name: result.name, vegetarian: result.vegetarian });
 
   renderOutputs();

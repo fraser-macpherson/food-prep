@@ -1,0 +1,25 @@
+{
+  "_comment": "5 optional breakfast/lunch items, shown in their own dropdown for each day alongside the dinner meal. Each key is the item name; 'cost' is its price (in the currency set in recipes.json) and 'vegetarian' controls the green asterisk marker, same as the dinner recipes. These items don't have ingredients or a method — they're meant to be quick, simple options rather than full recipes.",
+  "items": {
+    "Porridge with Berries": {
+      "cost": 1.50,
+      "vegetarian": true
+    },
+    "Toast & Scrambled Eggs": {
+      "cost": 1.90,
+      "vegetarian": true
+    },
+    "Ham & Cheese Sandwich": {
+      "cost": 2.20,
+      "vegetarian": false
+    },
+    "Chicken Caesar Wrap": {
+      "cost": 3.10,
+      "vegetarian": false
+    },
+    "Greek Yoghurt & Granola": {
+      "cost": 1.60,
+      "vegetarian": true
+    }
+  }
+}

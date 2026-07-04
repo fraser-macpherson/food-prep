@@ -1,21 +1,21 @@
 {
-  "_comment": "Each key must exactly match a meal name in meals.json. 'ingredients' is a list of strings. 'instructions' is a short method. 'vegetarian' is true or false and controls the green asterisk marker shown next to the meal name around the site.",
+  "_comment": "Each key must exactly match a meal name in meals.json. 'ingredients' is a list of strings. 'instructions' is a short method. 'vegetarian' is true or false and controls the green asterisk marker. 'cost' is the price of that meal (a plain number, no currency symbol) — 'currency' below sets which symbol is shown for it across the whole site, including breakfast_lunch.json.",
+  "currency": "GBP",
   "recipes": {
     "Spaghetti Bolognese": {
       "ingredients": [
         "250g spaghetti",
-        "500g beef mince",
-        "1 brown onion, diced",
+        "400g beef mince",
+        "1 onion, diced",
         "2 garlic cloves, crushed",
         "400g tinned tomatoes",
         "2 tbsp tomato puree",
         "1 carrot, diced",
-        "Salt, Peper",
-        "Beef Stock",
         "Parmesan, to serve"
       ],
-      "instructions": "Brown the mince, soften the onion, carrot and garlic, add tomatoes, puree, stock and seasoning. Simmer 20 mins. Serve over cooked spaghetti with parmesan.",
-      "vegetarian": false
+      "instructions": "Brown the mince, soften the onion, carrot and garlic, add tomatoes and puree, simmer 20 mins. Serve over cooked spaghetti with parmesan.",
+      "vegetarian": false,
+      "cost": 4.80
     },
     "Chicken Curry": {
       "ingredients": [
@@ -29,7 +29,8 @@
         "Fresh coriander"
       ],
       "instructions": "Fry onion, garlic and ginger, add curry powder, then chicken. Pour in coconut milk and simmer 15 mins. Serve with rice and coriander.",
-      "vegetarian": false
+      "vegetarian": false,
+      "cost": 5.60
     },
     "Veggie Stir Fry": {
       "ingredients": [
@@ -43,7 +44,8 @@
         "1 tbsp sesame seeds"
       ],
       "instructions": "Fry tofu until golden, set aside. Stir fry vegetables, add tofu, soy sauce and sesame oil. Toss with cooked noodles and sesame seeds.",
-      "vegetarian": true
+      "vegetarian": true,
+      "cost": 3.90
     },
     "Beef Tacos": {
       "ingredients": [
@@ -56,7 +58,8 @@
         "Sour cream"
       ],
       "instructions": "Brown mince with taco seasoning and a splash of water. Fill taco shells with mince, lettuce, tomato, cheese and sour cream.",
-      "vegetarian": false
+      "vegetarian": false,
+      "cost": 6.20
     },
     "Salmon & Roast Veg": {
       "ingredients": [
@@ -68,7 +71,8 @@
         "1 lemon"
       ],
       "instructions": "Toss vegetables in oil, roast 20 mins at 200C. Add salmon for the final 12 mins. Squeeze lemon over before serving.",
-      "vegetarian": false
+      "vegetarian": false,
+      "cost": 7.50
     },
     "Mushroom Risotto": {
       "ingredients": [
@@ -81,7 +85,8 @@
         "1 knob butter"
       ],
       "instructions": "Soften onion and mushrooms, add rice and wine, then add stock gradually, stirring, until creamy. Stir through butter and parmesan.",
-      "vegetarian": true
+      "vegetarian": true,
+      "cost": 4.40
     },
     "Lentil Soup": {
       "ingredients": [
@@ -94,7 +99,8 @@
         "1 tin chopped tomatoes"
       ],
       "instructions": "Saute onion, carrot and celery, add lentils, cumin, tomatoes and stock. Simmer 25 mins until lentils are soft, then blend if desired.",
-      "vegetarian": true
+      "vegetarian": true,
+      "cost": 2.70
     },
     "Chicken Caesar Salad": {
       "ingredients": [
@@ -105,7 +111,8 @@
         "3 tbsp caesar dressing"
       ],
       "instructions": "Grill or pan-fry chicken until cooked, slice. Toss lettuce with dressing, top with chicken, parmesan and croutons.",
-      "vegetarian": false
+      "vegetarian": false,
+      "cost": 5.10
     },
     "Sausage & Mash": {
       "ingredients": [
@@ -117,7 +124,8 @@
         "300ml beef gravy"
       ],
       "instructions": "Grill sausages until browned. Boil and mash potatoes with butter and milk. Fry onions and stir through gravy. Serve together.",
-      "vegetarian": false
+      "vegetarian": false,
+      "cost": 4.20
     },
     "Margherita Pizza": {
       "ingredients": [
@@ -128,7 +136,8 @@
         "1 tbsp olive oil"
       ],
       "instructions": "Spread passata over the base, tear over mozzarella, drizzle with oil and bake at 220C for 10-12 mins. Top with fresh basil.",
-      "vegetarian": true
+      "vegetarian": true,
+      "cost": 3.60
     }
   }
 }
