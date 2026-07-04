@@ -54,26 +54,36 @@ the field is left out of an older entry.
 
 ## Lunch and Breakfast
 
-Each day now has three optional dropdowns, in this order: **Dinner**,
-**Lunch**, and **Breakfast** — pick any combination (all three, one, two,
-or none) for any given day. The lunch and breakfast items come from
-`data/lunch.json` and `data/breakfast.json` respectively, and are
-intentionally simpler than dinner recipes: just a name, a cost, and a
-vegetarian flag, with no ingredients or method, since they're meant to be
-quick, ready-made options (a sandwich, porridge, and so on) rather than full
-recipes.
+Each day's card only has one dropdown, for **Dinner** (one dinner meal per
+day, as before). Lunch and breakfast aren't tied to a specific day —
+instead, there's a **Breakfast** panel and a **Lunch** panel underneath the
+day cards, each holding a free-standing list of picks for the week. Every
+panel starts with two rows; use **+ Add Breakfast** / **+ Add Lunch** to add
+as many more as you like, and the small `×` button on a row to remove it.
+Pick a breakfast or lunch item on a row, leave it as "No meal", or delete
+the row entirely — there's no day attached, so add exactly as many
+breakfasts or lunches as you actually want for the week.
 
-On the results page, a day's card shows a block for every meal type picked
-that day (dinner, lunch, breakfast), clearly labelled; types left as "No
-meal" are simply omitted from the card. The weekly receipt lists every pick
-with a "(Dinner)", "(Lunch)", or "(Breakfast)" tag next to it, and the total
-adds up all three types together. The "Combined ingredients" shopping list
-only pulls from dinner recipes, since lunch and breakfast items don't have
-an ingredient breakdown.
+The lunch and breakfast items come from `data/lunch.json` and
+`data/breakfast.json` respectively, and are intentionally simpler than
+dinner recipes: just a name, a cost, and a vegetarian flag, with no
+ingredients or method, since they're meant to be quick, ready-made options
+(a sandwich, porridge, and so on) rather than full recipes.
 
-You can offer up to 5 items per dropdown (or more, or fewer — 5 is just
-what's in the example data, not a hard limit) by adding or removing entries
-in `lunch.json` or `breakfast.json` (see the format below).
+On the results page, the dinner cards still appear one per day as before.
+Any breakfasts and lunches you picked show up underneath as their own
+"This week's breakfasts" / "This week's lunches" cards, numbered in the
+order you added them (e.g. "Breakfast 1", "Breakfast 2") since they aren't
+linked to a particular day. The weekly receipt lists every pick with a
+"(Dinner)", "(Lunch)", or "(Breakfast)" tag next to it, and the total adds
+up all three types together. The "Combined ingredients" shopping list only
+pulls from dinner recipes, since lunch and breakfast items don't have an
+ingredient breakdown.
+
+You can offer as many items as you like in the Breakfast/Lunch dropdowns
+(5 is just what's in the example data, not a hard limit) by adding or
+removing entries in `lunch.json` or `breakfast.json` (see the format
+below).
 
 ## Adding your own shopping list items
 
@@ -271,12 +281,14 @@ site correctly automatically, so once it's published this isn't a concern.
 
 ## Notes on behaviour
 
-- Days left as "No meal" (for dinner, lunch, breakfast, or any combination)
-  are skipped in the results and shopping list.
-- If the same meal or item is picked for two different days (or for two
-  different meal types on the same day), it's listed twice in the daily
-  breakdown, and its cost is counted twice in the weekly total (it's two
-  separate things to cook and buy for).
+- A day left as "No meal" for dinner is skipped in the results and shopping
+  list (its card just says so). An empty or "No meal" row in the Breakfast
+  or Lunch panel is likewise skipped — it doesn't add a blank entry to the
+  results or receipt.
+- If the same dinner is picked for two different days, or the same
+  breakfast/lunch item is picked on two different rows, it's listed twice
+  and its cost is counted twice in the weekly total (it's two separate
+  things to cook or buy for).
 - Ingredients spelled identically in two dinner recipes are combined into a
   single line with a "(x2)" count in the shopping list; ingredients written
   slightly differently (e.g. "1 onion" vs "1 onion, diced") are listed
