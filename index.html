@@ -971,7 +971,7 @@ textarea:focus-visible {
 <script>
 /* ===========================================================
    Weekly Meal Plan — app logic
-   Loads data/meals.json, data/recipes.json, data/breakfast_lunch.json
+   Loads data/meals.json, data/recipes.json, data/lunch.json, data/breakfast.json
    and drives the day-picker -> results flow.
 =========================================================== */
 
@@ -988,7 +988,8 @@ const DAYS = [
 const state = {
   meals: [],
   recipes: {},
-  blItems: {},
+  lunchItems: {},
+  breakfastItems: {},
   currency: "GBP",
 };
 
@@ -1014,8 +1015,13 @@ function isVegetarian(mealName) {
   return !!(recipe && recipe.vegetarian === true);
 }
 
-function isBlVegetarian(itemName) {
-  const item = state.blItems[itemName];
+function isLunchVegetarian(itemName) {
+  const item = state.lunchItems[itemName];
+  return !!(item && item.vegetarian === true);
+}
+
+function isBreakfastVegetarian(itemName) {
+  const item = state.breakfastItems[itemName];
   return !!(item && item.vegetarian === true);
 }
 
@@ -1024,8 +1030,13 @@ function getDinnerCost(mealName) {
   return recipe && typeof recipe.cost === "number" ? recipe.cost : undefined;
 }
 
-function getBlCost(itemName) {
-  const item = state.blItems[itemName];
+function getLunchCost(itemName) {
+  const item = state.lunchItems[itemName];
+  return item && typeof item.cost === "number" ? item.cost : undefined;
+}
+
+function getBreakfastCost(itemName) {
+  const item = state.breakfastItems[itemName];
   return item && typeof item.cost === "number" ? item.cost : undefined;
 }
 
@@ -1038,24 +1049,27 @@ function vegMarkerHtml() {
 async function loadData() {
   const status = document.getElementById("planner-status");
   try {
-    const [mealsRes, recipesRes, blRes] = await Promise.all([
+    const [mealsRes, recipesRes, lunchRes, breakfastRes] = await Promise.all([
       fetch("data/meals.json", { cache: "no-store" }),
       fetch("data/recipes.json", { cache: "no-store" }),
-      fetch("data/breakfast_lunch.json", { cache: "no-store" }),
+      fetch("data/lunch.json", { cache: "no-store" }),
+      fetch("data/breakfast.json", { cache: "no-store" }),
     ]);
 
-    if (!mealsRes.ok || !recipesRes.ok || !blRes.ok) {
+    if (!mealsRes.ok || !recipesRes.ok || !lunchRes.ok || !breakfastRes.ok) {
       throw new Error("One or more data files could not be loaded.");
     }
 
     const mealsJson = await mealsRes.json();
     const recipesJson = await recipesRes.json();
-    const blJson = await blRes.json();
+    const lunchJson = await lunchRes.json();
+    const breakfastJson = await breakfastRes.json();
 
     state.meals = Array.isArray(mealsJson.meals) ? mealsJson.meals : [];
     state.recipes = recipesJson.recipes || {};
     state.currency = recipesJson.currency || "GBP";
-    state.blItems = blJson.items || {};
+    state.lunchItems = lunchJson.items || {};
+    state.breakfastItems = breakfastJson.items || {};
 
     if (state.meals.length === 0) {
       status.textContent = "No meals found in data/meals.json — add some meal names to get started.";
@@ -1098,7 +1112,8 @@ function buildDayCards() {
   const rack = document.getElementById("day-cards");
   rack.innerHTML = "";
 
-  const blNames = Object.keys(state.blItems);
+  const lunchNames = Object.keys(state.lunchItems);
+  const breakfastNames = Object.keys(state.breakfastItems);
 
   DAYS.forEach((day) => {
     const card = document.createElement("div");
@@ -1125,21 +1140,37 @@ function buildDayCards() {
     dinnerGroup.appendChild(dinnerSelect);
     card.appendChild(dinnerGroup);
 
-    const blGroup = document.createElement("div");
-    blGroup.className = "select-group";
-    const blLabel = document.createElement("label");
-    blLabel.className = "meal-type-label";
-    blLabel.setAttribute("for", `select-${day.key}-bl`);
-    blLabel.textContent = "Breakfast / Lunch";
-    const blSelect = buildSelect(
-      `select-${day.key}-bl`,
-      `Breakfast or lunch for ${day.label}`,
-      blNames,
-      isBlVegetarian
+    const lunchGroup = document.createElement("div");
+    lunchGroup.className = "select-group";
+    const lunchLabel = document.createElement("label");
+    lunchLabel.className = "meal-type-label";
+    lunchLabel.setAttribute("for", `select-${day.key}-lunch`);
+    lunchLabel.textContent = "Lunch";
+    const lunchSelect = buildSelect(
+      `select-${day.key}-lunch`,
+      `Lunch for ${day.label}`,
+      lunchNames,
+      isLunchVegetarian
     );
-    blGroup.appendChild(blLabel);
-    blGroup.appendChild(blSelect);
-    card.appendChild(blGroup);
+    lunchGroup.appendChild(lunchLabel);
+    lunchGroup.appendChild(lunchSelect);
+    card.appendChild(lunchGroup);
+
+    const breakfastGroup = document.createElement("div");
+    breakfastGroup.className = "select-group";
+    const breakfastLabel = document.createElement("label");
+    breakfastLabel.className = "meal-type-label";
+    breakfastLabel.setAttribute("for", `select-${day.key}-breakfast`);
+    breakfastLabel.textContent = "Breakfast";
+    const breakfastSelect = buildSelect(
+      `select-${day.key}-breakfast`,
+      `Breakfast for ${day.label}`,
+      breakfastNames,
+      isBreakfastVegetarian
+    );
+    breakfastGroup.appendChild(breakfastLabel);
+    breakfastGroup.appendChild(breakfastSelect);
+    card.appendChild(breakfastGroup);
 
     rack.appendChild(card);
   });
@@ -1148,12 +1179,14 @@ function buildDayCards() {
 function getSelections() {
   return DAYS.map((day) => {
     const dinnerSelect = document.getElementById(`select-${day.key}-dinner`);
-    const blSelect = document.getElementById(`select-${day.key}-bl`);
+    const lunchSelect = document.getElementById(`select-${day.key}-lunch`);
+    const breakfastSelect = document.getElementById(`select-${day.key}-breakfast`);
     return {
       key: day.key,
       label: day.label,
       dinner: dinnerSelect ? dinnerSelect.value : "",
-      bl: blSelect ? blSelect.value : "",
+      lunch: lunchSelect ? lunchSelect.value : "",
+      breakfast: breakfastSelect ? breakfastSelect.value : "",
     };
   });
 }
@@ -1162,7 +1195,7 @@ function getSelections() {
 
 function buildResults() {
   const selections = getSelections();
-  const anyChosen = selections.some((s) => s.dinner || s.bl);
+  const anyChosen = selections.some((s) => s.dinner || s.lunch || s.breakfast);
   const status = document.getElementById("planner-status");
 
   if (!anyChosen) {
@@ -1190,7 +1223,7 @@ function renderDailyBreakdown(selections) {
     const card = document.createElement("div");
     card.className = "recipe-card";
 
-    if (!sel.dinner && !sel.bl) {
+    if (!sel.dinner && !sel.lunch && !sel.breakfast) {
       card.classList.add("empty-day");
       card.innerHTML = `
         <div class="day-label">${sel.label}</div>
@@ -1238,17 +1271,34 @@ function renderDailyBreakdown(selections) {
       `;
     }
 
-    if (sel.bl) {
-      const item = state.blItems[sel.bl];
-      const cost = getBlCost(sel.bl);
+    if (sel.lunch) {
+      const item = state.lunchItems[sel.lunch];
+      const cost = getLunchCost(sel.lunch);
       const missingHtml = !item || typeof cost !== "number"
         ? `<p class="missing-note">No cost found for this item.</p>`
         : "";
 
       blocksHtml += `
         <div class="meal-block">
-          <p class="meal-type-label">Breakfast / Lunch</p>
-          <h3 class="meal-name">${escapeHtml(sel.bl)}${isBlVegetarian(sel.bl) ? vegMarkerHtml() : ""}</h3>
+          <p class="meal-type-label">Lunch</p>
+          <h3 class="meal-name">${escapeHtml(sel.lunch)}${isLunchVegetarian(sel.lunch) ? vegMarkerHtml() : ""}</h3>
+          <div class="meal-cost">${formatMoney(cost)}</div>
+          ${missingHtml}
+        </div>
+      `;
+    }
+
+    if (sel.breakfast) {
+      const item = state.breakfastItems[sel.breakfast];
+      const cost = getBreakfastCost(sel.breakfast);
+      const missingHtml = !item || typeof cost !== "number"
+        ? `<p class="missing-note">No cost found for this item.</p>`
+        : "";
+
+      blocksHtml += `
+        <div class="meal-block">
+          <p class="meal-type-label">Breakfast</p>
+          <h3 class="meal-name">${escapeHtml(sel.breakfast)}${isBreakfastVegetarian(sel.breakfast) ? vegMarkerHtml() : ""}</h3>
           <div class="meal-cost">${formatMoney(cost)}</div>
           ${missingHtml}
         </div>
@@ -1295,9 +1345,9 @@ function renderWeeklySummary(selections) {
         </div>`);
     }
 
-    if (sel.bl) {
+    if (sel.lunch) {
       plannedCount += 1;
-      const cost = getBlCost(sel.bl);
+      const cost = getLunchCost(sel.lunch);
 
       if (typeof cost === "number") {
         mealTotal += cost;
@@ -1307,7 +1357,24 @@ function renderWeeklySummary(selections) {
 
       mealLineParts.push(`
         <div class="receipt-line">
-          <span class="label">${sel.label} &mdash; ${escapeHtml(sel.bl)}${isBlVegetarian(sel.bl) ? vegMarkerHtml() : ""} <span class="receipt-meal-type">(Breakfast/Lunch)</span></span>
+          <span class="label">${sel.label} &mdash; ${escapeHtml(sel.lunch)}${isLunchVegetarian(sel.lunch) ? vegMarkerHtml() : ""} <span class="receipt-meal-type">(Lunch)</span></span>
+          <span class="value">${formatMoney(cost)}</span>
+        </div>`);
+    }
+
+    if (sel.breakfast) {
+      plannedCount += 1;
+      const cost = getBreakfastCost(sel.breakfast);
+
+      if (typeof cost === "number") {
+        mealTotal += cost;
+      } else {
+        missingCostCount += 1;
+      }
+
+      mealLineParts.push(`
+        <div class="receipt-line">
+          <span class="label">${sel.label} &mdash; ${escapeHtml(sel.breakfast)}${isBreakfastVegetarian(sel.breakfast) ? vegMarkerHtml() : ""} <span class="receipt-meal-type">(Breakfast)</span></span>
           <span class="value">${formatMoney(cost)}</span>
         </div>`);
     }

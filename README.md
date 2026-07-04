@@ -1,7 +1,7 @@
 # Weekly Meal Plan
 
-A simple, good-looking website for picking a dinner, and an optional
-breakfast/lunch, for each day of the week, then seeing the recipes,
+A simple, good-looking website for picking a dinner, lunch, and breakfast
+(each optional) for each day of the week, then seeing the recipes,
 ingredients, and total cost for the whole week's shop. Vegetarian meals are
 marked with a green asterisk (*) throughout, and you can add your own extra
 items (like milk or bread) to the shopping list on the results page.
@@ -18,8 +18,10 @@ items (like milk or bread) to the shopping list on the results page.
   dropdown.
 - `data/recipes.json` — ingredients, a short method, a vegetarian true/false
   flag, and the cost, all together for each dinner meal.
-- `data/breakfast_lunch.json` — the (up to) 5 breakfast/lunch options
-  offered in their own dropdown, each with a cost and a vegetarian flag.
+- `data/lunch.json` — the (up to) 5 lunch options offered in their own
+  dropdown, each with a cost and a vegetarian flag.
+- `data/breakfast.json` — the (up to) 5 breakfast options offered in their
+  own dropdown, each with a cost and a vegetarian flag.
 - `.nojekyll` — tells GitHub Pages to serve the files as-is, without running
   them through Jekyll first. Keep this file even though it looks empty.
 
@@ -27,8 +29,9 @@ items (like milk or bread) to the shopping list on the results page.
 `meals.json` only shows a recipe and a cost if the exact same name also
 appears as a key in `recipes.json`. If a name is missing from `recipes.json`,
 the site still works — it just shows "No recipe found" or "No cost found"
-for that meal instead of breaking. Breakfast/lunch items are self-contained
-in `breakfast_lunch.json` and don't need an entry anywhere else.
+for that meal instead of breaking. Lunch and breakfast items are
+self-contained in `lunch.json` and `breakfast.json` respectively, and don't
+need an entry anywhere else.
 
 ## Vegetarian marker
 
@@ -49,26 +52,28 @@ page as a key. Meals with no `vegetarian` field, or with it set to `false`,
 are treated as non-vegetarian and shown with no marker — nothing breaks if
 the field is left out of an older entry.
 
-## Breakfast / Lunch
+## Lunch and Breakfast
 
-Each day now has a second, optional dropdown for a breakfast/lunch item,
-alongside the existing dinner dropdown — pick one, both, or neither for any
-given day. These items come from `data/breakfast_lunch.json` and are
+Each day now has three optional dropdowns, in this order: **Dinner**,
+**Lunch**, and **Breakfast** — pick any combination (all three, one, two,
+or none) for any given day. The lunch and breakfast items come from
+`data/lunch.json` and `data/breakfast.json` respectively, and are
 intentionally simpler than dinner recipes: just a name, a cost, and a
 vegetarian flag, with no ingredients or method, since they're meant to be
 quick, ready-made options (a sandwich, porridge, and so on) rather than full
 recipes.
 
-On the results page, a day with both a dinner and a breakfast/lunch pick
-shows both in its card, clearly labelled; a day with just one shows only
-that one. The weekly receipt lists every pick with a "(Dinner)" or
-"(Breakfast/Lunch)" tag next to it, and the total adds up both types
-together. The "Combined ingredients" shopping list only pulls from dinner
-recipes, since breakfast/lunch items don't have an ingredient breakdown.
+On the results page, a day's card shows a block for every meal type picked
+that day (dinner, lunch, breakfast), clearly labelled; types left as "No
+meal" are simply omitted from the card. The weekly receipt lists every pick
+with a "(Dinner)", "(Lunch)", or "(Breakfast)" tag next to it, and the total
+adds up all three types together. The "Combined ingredients" shopping list
+only pulls from dinner recipes, since lunch and breakfast items don't have
+an ingredient breakdown.
 
-You can offer up to 5 items (or more, or fewer — 5 is just what's in the
-example data, not a hard limit) by adding or removing entries in
-`breakfast_lunch.json` (see the format below).
+You can offer up to 5 items per dropdown (or more, or fewer — 5 is just
+what's in the example data, not a hard limit) by adding or removing entries
+in `lunch.json` or `breakfast.json` (see the format below).
 
 ## Adding your own shopping list items
 
@@ -81,16 +86,17 @@ button next to an item to remove it.
 These are session-only: they exist just in your browser for the week you're
 currently planning, aren't saved anywhere, and reset whenever you plan a new
 week. They're for quick additions on the fly, not for changing what's
-offered in the dropdowns — for that, edit `breakfast_lunch.json` or use the
-Add options page (for dinner meals) instead.
+offered in the dropdowns — for that, edit `lunch.json` or `breakfast.json`,
+or use the Add options page (for dinner meals) instead.
 
 ## Requesting new meals through the website
 
 `add.html` (linked from the nav bar and footer as **Add options**) gives you
 a form for putting together a request for a new **dinner** meal — its
 recipe, ingredients, cost, and whether it's vegetarian — with built-in
-validation. (Breakfast/lunch items don't have a request form since they're
-simple enough to add directly in `breakfast_lunch.json` — see below.)
+validation. (Lunch and breakfast items don't have a request form since
+they're simple enough to add directly in `lunch.json` or `breakfast.json`
+— see below.)
 
 - **Shared password** — required, and masked as you type. The page checks it
   against a stored hash rather than a plain-text value.
@@ -189,7 +195,24 @@ The top-level `"currency"` field controls which symbol is shown for prices
 everywhere on the site, including breakfast/lunch items — use `GBP`, `USD`,
 or `EUR`.
 
-### `data/breakfast_lunch.json`
+### `data/lunch.json`
+```json
+{
+  "items": {
+    "Ham & Cheese Sandwich": {
+      "cost": 2.20,
+      "vegetarian": false
+    }
+  }
+}
+```
+Each key is the item name shown in the Lunch dropdown. `"cost"` and
+`"vegetarian"` work exactly the same as in `recipes.json`. There's no
+`ingredients` or `instructions` field here — these are meant to stay simple,
+ready-made options rather than full recipes. Add, remove, or rename entries
+freely; there's no separate list to keep in sync, unlike dinner meals.
+
+### `data/breakfast.json`
 ```json
 {
   "items": {
@@ -200,11 +223,8 @@ or `EUR`.
   }
 }
 ```
-Each key is the item name shown in the breakfast/lunch dropdown. `"cost"`
-and `"vegetarian"` work exactly the same as in `recipes.json`. There's no
-`ingredients` or `instructions` field here — these are meant to stay simple,
-ready-made options rather than full recipes. Add, remove, or rename entries
-freely; there's no separate list to keep in sync, unlike dinner meals.
+Same format as `lunch.json`, but for the items shown in the Breakfast
+dropdown. Add, remove, or rename entries freely.
 
 If you ever want to change the look of the page or the dropdown/results
 behaviour, the styling lives in the `<style>` block and the logic lives in
@@ -233,7 +253,7 @@ site correctly automatically, so once it's published this isn't a concern.
 
 1. Create a new GitHub repository.
 2. Upload **all four items** from this folder — `index.html`, `add.html`,
-   the `data/` folder (with its three `.json` files inside), and
+   the `data/` folder (with its four `.json` files inside), and
    `.nojekyll` — keeping `index.html`, `add.html`, and `.nojekyll` at the
    root of the repository, and `data/` as a folder alongside them. If you're
    using GitHub's web upload, drag the whole `data` folder in at once rather
@@ -251,16 +271,18 @@ site correctly automatically, so once it's published this isn't a concern.
 
 ## Notes on behaviour
 
-- Days left as "No meal" (for dinner, breakfast/lunch, or both) are skipped
-  in the results and shopping list.
-- If the same meal or item is picked for two different days, it's listed
-  twice in the daily breakdown, and its cost is counted twice in the weekly
-  total (it's two separate meals to cook and buy for).
+- Days left as "No meal" (for dinner, lunch, breakfast, or any combination)
+  are skipped in the results and shopping list.
+- If the same meal or item is picked for two different days (or for two
+  different meal types on the same day), it's listed twice in the daily
+  breakdown, and its cost is counted twice in the weekly total (it's two
+  separate things to cook and buy for).
 - Ingredients spelled identically in two dinner recipes are combined into a
   single line with a "(x2)" count in the shopping list; ingredients written
   slightly differently (e.g. "1 onion" vs "1 onion, diced") are listed
-  separately, since the site matches ingredient text exactly. Breakfast/lunch
-  items don't contribute to this list since they don't have ingredients.
+  separately, since the site matches ingredient text exactly. Lunch and
+  breakfast items don't contribute to this list since they don't have
+  ingredients.
 - Extra shopping list items you add on the results page are per-session:
   they're not saved anywhere and reset the next time you click "Plan my
   week".

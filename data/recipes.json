@@ -1,5 +1,5 @@
 {
-  "_comment": "Each key must exactly match a meal name in meals.json. 'ingredients' is a list of strings. 'instructions' is a short method. 'vegetarian' is true or false and controls the green asterisk marker. 'cost' is the price of that meal (a plain number, no currency symbol) — 'currency' below sets which symbol is shown for it across the whole site, including breakfast_lunch.json.",
+  "_comment": "Each key must exactly match a meal name in meals.json. 'ingredients' is a list of strings. 'instructions' is a short method. 'vegetarian' is true or false and controls the green asterisk marker. 'cost' is the price of that meal (a plain number, no currency symbol) — 'currency' below sets which symbol is shown for it across the whole site, including lunch.json and breakfast.json.",
   "currency": "GBP",
   "recipes": {
     "Spaghetti Bolognese": {

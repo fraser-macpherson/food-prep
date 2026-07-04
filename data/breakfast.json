@@ -1,0 +1,25 @@
+{
+  "_comment": "Breakfast items, shown in their own dropdown for each day. Each key is the item name; 'cost' is its price (in the currency set in recipes.json) and 'vegetarian' controls the green asterisk marker, same as the dinner recipes. These items don't have ingredients or a method — they're meant to be quick, simple options rather than full recipes.",
+  "items": {
+    "Porridge with Berries": {
+      "cost": 1.50,
+      "vegetarian": true
+    },
+    "Toast & Scrambled Eggs": {
+      "cost": 1.90,
+      "vegetarian": true
+    },
+    "Greek Yoghurt & Granola": {
+      "cost": 1.60,
+      "vegetarian": true
+    },
+    "Bacon & Egg Muffin": {
+      "cost": 2.40,
+      "vegetarian": false
+    },
+    "Overnight Oats": {
+      "cost": 1.40,
+      "vegetarian": true
+    }
+  }
+}

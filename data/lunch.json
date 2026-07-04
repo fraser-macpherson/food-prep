@@ -1,0 +1,25 @@
+{
+  "_comment": "Lunch items, shown in their own dropdown for each day. Each key is the item name; 'cost' is its price (in the currency set in recipes.json) and 'vegetarian' controls the green asterisk marker, same as the dinner recipes. These items don't have ingredients or a method — they're meant to be quick, simple options rather than full recipes.",
+  "items": {
+    "Ham & Cheese Sandwich": {
+      "cost": 2.20,
+      "vegetarian": false
+    },
+    "Chicken Caesar Wrap": {
+      "cost": 3.10,
+      "vegetarian": false
+    },
+    "Vegetable Soup & Bread": {
+      "cost": 2.10,
+      "vegetarian": true
+    },
+    "Tuna Pasta Salad": {
+      "cost": 2.80,
+      "vegetarian": false
+    },
+    "Falafel Wrap": {
+      "cost": 2.60,
+      "vegetarian": true
+    }
+  }
+}
