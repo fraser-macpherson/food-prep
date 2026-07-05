@@ -1084,15 +1084,26 @@ function clearBanner() {
 /* ---------- Data loading ---------- */
 
 async function loadData() {
-  const [mealsRes, recipesRes] = await Promise.all([
-    fetch("data/meals.json", { cache: "no-store" }),
-    fetch("data/recipes.json", { cache: "no-store" }),
-  ]);
+  const files = [
+    { path: "data/meals.json", key: "meals" },
+    { path: "data/recipes.json", key: "recipes" },
+  ];
 
-  if (!mealsRes.ok || !recipesRes.ok) {
-    throw new Error("One or more data files could not be loaded.");
+  const responses = await Promise.all(
+    files.map((f) => fetch(f.path, { cache: "no-store" }).catch((err) => ({ ok: false, _networkError: err })))
+  );
+
+  const failed = files.filter((f, i) => !responses[i].ok);
+  if (failed.length > 0) {
+    const names = failed.map((f) => f.path).join(", ");
+    throw new Error(
+      `Couldn't load: ${names}. Make sure these files exist in a "data" folder ` +
+      `next to add.html (data/meals.json, data/recipes.json), with those exact ` +
+      `names and capitalisation.`
+    );
   }
 
+  const [mealsRes, recipesRes] = responses;
   workingMeals = await mealsRes.json();
   workingRecipes = await recipesRes.json();
 
@@ -1332,10 +1343,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadData();
   } catch (err) {
     console.error(err);
-    showBanner(
-      "error",
-      "Couldn't load the data files, so a request can't be put together right now. If you're opening this file directly from disk, try opening it from the website's live address instead."
-    );
+    const detail = err && err.message ? err.message : "Couldn't load the data files, so a request can't be put together right now.";
+    const suffix = location.protocol === "file:"
+      ? " This page was opened directly from disk — serve it over http(s):// instead (e.g. GitHub Pages, or `python3 -m http.server` locally)."
+      : "";
+    showBanner("error", detail + suffix);
     document.getElementById("add-meal-submit").disabled = true;
   }
 

@@ -3,10 +3,10 @@
   "items": {
     "Ham & Cheese Sandwich": {
       "ingredients": [
-        "Bread",
-        "Ham,
-        "Cheese",
-        "Butter"
+        "2 slices bread",
+        "2 slices ham",
+        "1 slice cheddar",
+        "1 tsp butter"
       ],
       "instructions": "Butter the bread, layer the ham and cheese, and slice in half.",
       "vegetarian": false,
@@ -14,11 +14,11 @@
     },
     "Chicken Caesar Wrap": {
       "ingredients": [
-        "Tortilla wraps",
-        "Cooked chicken breast, sliced",
-        "Romaine lettuce",
-        "Salad/Caesar dressing",
-        "Parmesan, shaved"
+        "1 tortilla wrap",
+        "1 cooked chicken breast, sliced",
+        "Handful romaine lettuce",
+        "2 tbsp caesar dressing",
+        "1 tbsp parmesan, shaved"
       ],
       "instructions": "Toss lettuce with dressing and parmesan, add sliced chicken, and roll up in the wrap.",
       "vegetarian": false,
@@ -26,23 +26,35 @@
     },
     "Vegetable Soup & Bread": {
       "ingredients": [
-        "Onion",
-        "2 Carrots",
-        "Celery sticks",
+        "1 onion, diced",
+        "2 carrots, diced",
+        "1 celery stick, diced",
         "500ml vegetable stock",
-        "Bread rolls"
+        "1 crusty bread roll"
       ],
       "instructions": "Simmer the vegetables in stock for 20 mins until soft, then blend if desired. Serve with the bread roll.",
       "vegetarian": true,
       "cost": 2.10
     },
+    "Tuna Pasta Salad": {
+      "ingredients": [
+        "100g pasta",
+        "1 tin tuna, drained",
+        "2 tbsp sweetcorn",
+        "2 tbsp mayonnaise",
+        "1/2 cucumber, diced"
+      ],
+      "instructions": "Cook and cool the pasta, then mix with tuna, sweetcorn, cucumber and mayonnaise.",
+      "vegetarian": false,
+      "cost": 2.80
+    },
     "Falafel Wrap": {
       "ingredients": [
-        "Tortilla wraps",
-        "Falafel",
-        "Hummus",
-        "Salad",
-        "Red onion, sliced"
+        "1 tortilla wrap",
+        "4 falafel balls",
+        "2 tbsp hummus",
+        "Handful mixed salad leaves",
+        "1/4 red onion, sliced"
       ],
       "instructions": "Spread hummus over the wrap, add salad, onion and falafel, then roll up tightly.",
       "vegetarian": true,

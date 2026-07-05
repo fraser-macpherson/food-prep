@@ -1173,22 +1173,31 @@ function vegMarkerHtml() {
 
 async function loadData() {
   const status = document.getElementById("planner-status");
-  try {
-    const [mealsRes, recipesRes, lunchRes, breakfastRes] = await Promise.all([
-      fetch("data/meals.json", { cache: "no-store" }),
-      fetch("data/recipes.json", { cache: "no-store" }),
-      fetch("data/lunch.json", { cache: "no-store" }),
-      fetch("data/breakfast.json", { cache: "no-store" }),
-    ]);
+  const files = [
+    { path: "data/meals.json", key: "meals" },
+    { path: "data/recipes.json", key: "recipes" },
+    { path: "data/lunch.json", key: "lunch" },
+    { path: "data/breakfast.json", key: "breakfast" },
+  ];
 
-    if (!mealsRes.ok || !recipesRes.ok || !lunchRes.ok || !breakfastRes.ok) {
-      throw new Error("One or more data files could not be loaded.");
+  try {
+    const responses = await Promise.all(
+      files.map((f) => fetch(f.path, { cache: "no-store" }).catch((err) => ({ ok: false, _networkError: err })))
+    );
+
+    const failed = files.filter((f, i) => !responses[i].ok);
+    if (failed.length > 0) {
+      const names = failed.map((f) => f.path).join(", ");
+      throw new Error(
+        `Couldn't load: ${names}. Make sure these files exist in a "data" folder ` +
+        `next to index.html (data/meals.json, data/recipes.json, data/lunch.json, ` +
+        `data/breakfast.json), with those exact names and capitalisation.`
+      );
     }
 
-    const mealsJson = await mealsRes.json();
-    const recipesJson = await recipesRes.json();
-    const lunchJson = await lunchRes.json();
-    const breakfastJson = await breakfastRes.json();
+    const [mealsJson, recipesJson, lunchJson, breakfastJson] = await Promise.all(
+      responses.map((r) => r.json())
+    );
 
     state.meals = Array.isArray(mealsJson.meals) ? mealsJson.meals : [];
     state.recipes = recipesJson.recipes || {};
@@ -1201,10 +1210,14 @@ async function loadData() {
     }
   } catch (err) {
     console.error(err);
-    status.textContent =
-      "Couldn't load the meal data. If you're opening this file directly from disk, " +
-      "try opening it from the website's live address instead — browsers block " +
-      "local file loading for security reasons.";
+    if (location.protocol === "file:") {
+      status.textContent =
+        "Couldn't load the meal data because this page was opened directly from disk. " +
+        "Serve it over http(s):// instead (e.g. `python3 -m http.server` locally, or via " +
+        "GitHub Pages) — browsers block local file loading for security reasons.";
+    } else {
+      status.textContent = err && err.message ? err.message : "Couldn't load the meal data.";
+    }
   }
 }
 
