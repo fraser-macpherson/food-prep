@@ -18,10 +18,12 @@ items (like milk or bread) to the shopping list on the results page.
   dropdown.
 - `data/recipes.json` — ingredients, a short method, a vegetarian true/false
   flag, and the cost, all together for each dinner meal.
-- `data/lunch.json` — the (up to) 5 lunch options offered in their own
-  dropdown, each with a cost and a vegetarian flag.
-- `data/breakfast.json` — the (up to) 5 breakfast options offered in their
-  own dropdown, each with a cost and a vegetarian flag.
+- `data/lunch.json` — ingredients, a short method, a vegetarian true/false
+  flag, and the cost for each of the (up to) 5 lunch options offered in
+  their own dropdown.
+- `data/breakfast.json` — ingredients, a short method, a vegetarian
+  true/false flag, and the cost for each of the (up to) 5 breakfast options
+  offered in their own dropdown.
 - `.nojekyll` — tells GitHub Pages to serve the files as-is, without running
   them through Jekyll first. Keep this file even though it looks empty.
 
@@ -65,20 +67,22 @@ the row entirely — there's no day attached, so add exactly as many
 breakfasts or lunches as you actually want for the week.
 
 The lunch and breakfast items come from `data/lunch.json` and
-`data/breakfast.json` respectively, and are intentionally simpler than
-dinner recipes: just a name, a cost, and a vegetarian flag, with no
-ingredients or method, since they're meant to be quick, ready-made options
-(a sandwich, porridge, and so on) rather than full recipes.
+`data/breakfast.json` respectively, and are structured just like
+`data/recipes.json` — a name, ingredients, a short method, a vegetarian
+flag, and a cost — so a quick sandwich or bowl of porridge gets the same
+recipe card and shopping-list treatment as a full dinner.
 
 On the results page, the dinner cards still appear one per day as before.
 Any breakfasts and lunches you picked show up underneath as their own
-"This week's breakfasts" / "This week's lunches" cards, numbered in the
-order you added them (e.g. "Breakfast 1", "Breakfast 2") since they aren't
-linked to a particular day. The weekly receipt lists every pick with a
-"(Dinner)", "(Lunch)", or "(Breakfast)" tag next to it, and the total adds
-up all three types together. The "Combined ingredients" shopping list only
-pulls from dinner recipes, since lunch and breakfast items don't have an
-ingredient breakdown.
+"This week's breakfasts" / "This week's lunches" cards — each with its
+ingredients and method, same as a dinner card — numbered in the order you
+added them (e.g. "Breakfast 1", "Breakfast 2") since they aren't linked to
+a particular day. The weekly receipt lists every pick with a "(Dinner)",
+"(Lunch)", or "(Breakfast)" tag next to it, and the total adds up all three
+types together. The "Combined ingredients" shopping list now pulls from
+dinner, lunch, and breakfast recipes alike — an ingredient used in more
+than one of them (worded identically) is combined into a single line with
+a "(x2)" count, same as for repeated dinner ingredients.
 
 You can offer as many items as you like in the Breakfast/Lunch dropdowns
 (5 is just what's in the example data, not a hard limit) by adding or
@@ -210,25 +214,30 @@ or `EUR`.
 {
   "items": {
     "Ham & Cheese Sandwich": {
-      "cost": 2.20,
-      "vegetarian": false
+      "ingredients": ["2 slices bread", "2 slices ham", "1 slice cheddar"],
+      "instructions": "Butter the bread, layer the ham and cheese, and slice in half.",
+      "vegetarian": false,
+      "cost": 2.20
     }
   }
 }
 ```
-Each key is the item name shown in the Lunch dropdown. `"cost"` and
-`"vegetarian"` work exactly the same as in `recipes.json`. There's no
-`ingredients` or `instructions` field here — these are meant to stay simple,
-ready-made options rather than full recipes. Add, remove, or rename entries
-freely; there's no separate list to keep in sync, unlike dinner meals.
+Each key is the item name shown in the Lunch dropdown. `"ingredients"`,
+`"instructions"`, `"cost"`, and `"vegetarian"` all work exactly the same as
+in `recipes.json` — ingredients are combined into the shopping list on the
+results page, and the instructions show on that item's recipe card. Add,
+remove, or rename entries freely; there's no separate list to keep in
+sync, unlike dinner meals.
 
 ### `data/breakfast.json`
 ```json
 {
   "items": {
     "Porridge with Berries": {
-      "cost": 1.50,
-      "vegetarian": true
+      "ingredients": ["50g porridge oats", "200ml milk", "Handful mixed berries"],
+      "instructions": "Simmer oats in milk for 5 mins, stirring often. Top with berries.",
+      "vegetarian": true,
+      "cost": 1.50
     }
   }
 }
@@ -289,12 +298,11 @@ site correctly automatically, so once it's published this isn't a concern.
   breakfast/lunch item is picked on two different rows, it's listed twice
   and its cost is counted twice in the weekly total (it's two separate
   things to cook or buy for).
-- Ingredients spelled identically in two dinner recipes are combined into a
-  single line with a "(x2)" count in the shopping list; ingredients written
-  slightly differently (e.g. "1 onion" vs "1 onion, diced") are listed
-  separately, since the site matches ingredient text exactly. Lunch and
-  breakfast items don't contribute to this list since they don't have
-  ingredients.
+- Ingredients spelled identically across any dinner, lunch, or breakfast
+  recipe are combined into a single line with a "(x2)" count in the
+  shopping list; ingredients written slightly differently (e.g. "1 onion"
+  vs "1 onion, diced") are listed separately, since the site matches
+  ingredient text exactly.
 - Extra shopping list items you add on the results page are per-session:
   they're not saved anywhere and reset the next time you click "Plan my
   week".

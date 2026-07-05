@@ -1,25 +1,64 @@
 {
-  "_comment": "Lunch items, shown in their own dropdown for each day. Each key is the item name; 'cost' is its price (in the currency set in recipes.json) and 'vegetarian' controls the green asterisk marker, same as the dinner recipes. These items don't have ingredients or a method — they're meant to be quick, simple options rather than full recipes.",
+  "_comment": "Each key is a lunch item name, shown in the Lunch dropdown. 'ingredients' is a list of strings and is combined into the shopping list on the results page, same as dinner recipes. 'instructions' is a short method. 'vegetarian' is true or false and controls the green asterisk marker. 'cost' is a plain number, no currency symbol — the 'currency' field in recipes.json sets which symbol is shown for it across the whole site.",
   "items": {
     "Ham & Cheese Sandwich": {
-      "cost": 2.20,
-      "vegetarian": false
+      "ingredients": [
+        "2 slices bread",
+        "2 slices ham",
+        "1 slice cheddar",
+        "1 tsp butter"
+      ],
+      "instructions": "Butter the bread, layer the ham and cheese, and slice in half.",
+      "vegetarian": false,
+      "cost": 2.20
     },
     "Chicken Caesar Wrap": {
-      "cost": 3.10,
-      "vegetarian": false
+      "ingredients": [
+        "1 tortilla wrap",
+        "1 cooked chicken breast, sliced",
+        "Handful romaine lettuce",
+        "2 tbsp caesar dressing",
+        "1 tbsp parmesan, shaved"
+      ],
+      "instructions": "Toss lettuce with dressing and parmesan, add sliced chicken, and roll up in the wrap.",
+      "vegetarian": false,
+      "cost": 3.10
     },
     "Vegetable Soup & Bread": {
-      "cost": 2.10,
-      "vegetarian": true
+      "ingredients": [
+        "1 onion, diced",
+        "2 carrots, diced",
+        "1 celery stick, diced",
+        "500ml vegetable stock",
+        "1 crusty bread roll"
+      ],
+      "instructions": "Simmer the vegetables in stock for 20 mins until soft, then blend if desired. Serve with the bread roll.",
+      "vegetarian": true,
+      "cost": 2.10
     },
     "Tuna Pasta Salad": {
-      "cost": 2.80,
-      "vegetarian": false
+      "ingredients": [
+        "100g pasta",
+        "1 tin tuna, drained",
+        "2 tbsp sweetcorn",
+        "2 tbsp mayonnaise",
+        "1/2 cucumber, diced"
+      ],
+      "instructions": "Cook and cool the pasta, then mix with tuna, sweetcorn, cucumber and mayonnaise.",
+      "vegetarian": false,
+      "cost": 2.80
     },
     "Falafel Wrap": {
-      "cost": 2.60,
-      "vegetarian": true
+      "ingredients": [
+        "1 tortilla wrap",
+        "4 falafel balls",
+        "2 tbsp hummus",
+        "Handful mixed salad leaves",
+        "1/4 red onion, sliced"
+      ],
+      "instructions": "Spread hummus over the wrap, add salad, onion and falafel, then roll up tightly.",
+      "vegetarian": true,
+      "cost": 2.60
     }
   }
 }

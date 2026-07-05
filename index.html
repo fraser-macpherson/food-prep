@@ -1422,14 +1422,33 @@ function renderExtraBreakdown(kind, picks) {
 
     const item = itemsData[name];
     const cost = costFn(name);
-    const missingHtml = !item || typeof cost !== "number"
-      ? `<p class="missing-note">No cost found for this item.</p>`
-      : "";
+
+    let ingredientsHtml = "";
+    let instructionsHtml = "";
+    let missingHtml = "";
+
+    if (item) {
+      const ingredients = Array.isArray(item.ingredients) ? item.ingredients : [];
+      ingredientsHtml = `<ul class="ingredient-list">${ingredients
+        .map((i) => `<li>${escapeHtml(i)}</li>`)
+        .join("")}</ul>`;
+      if (item.instructions) {
+        instructionsHtml = `<p class="meal-instructions">${escapeHtml(item.instructions)}</p>`;
+      }
+    } else {
+      missingHtml += `<p class="missing-note">No recipe found for this item.</p>`;
+    }
+
+    if (typeof cost !== "number") {
+      missingHtml += `<p class="missing-note">No cost found for this item.</p>`;
+    }
 
     card.innerHTML = `
       <div class="day-label">${typeLabel} ${idx + 1}</div>
       <h3 class="meal-name">${escapeHtml(name)}${vegFn(name) ? vegMarkerHtml() : ""}</h3>
       <div class="meal-cost">${formatMoney(cost)}</div>
+      ${instructionsHtml}
+      ${ingredientsHtml}
       ${missingHtml}
     `;
     rack.appendChild(card);
@@ -1473,12 +1492,19 @@ function renderWeeklySummary(plan) {
 
   plan.breakfasts.forEach((name, idx) => {
     plannedCount += 1;
+    const item = state.breakfastItems[name];
     const cost = getBreakfastCost(name);
 
     if (typeof cost === "number") {
       mealTotal += cost;
     } else {
       missingCostCount += 1;
+    }
+
+    if (item && Array.isArray(item.ingredients)) {
+      item.ingredients.forEach((ing) => {
+        ingredientTally.set(ing, (ingredientTally.get(ing) || 0) + 1);
+      });
     }
 
     mealLineParts.push(`
@@ -1490,12 +1516,19 @@ function renderWeeklySummary(plan) {
 
   plan.lunches.forEach((name, idx) => {
     plannedCount += 1;
+    const item = state.lunchItems[name];
     const cost = getLunchCost(name);
 
     if (typeof cost === "number") {
       mealTotal += cost;
     } else {
       missingCostCount += 1;
+    }
+
+    if (item && Array.isArray(item.ingredients)) {
+      item.ingredients.forEach((ing) => {
+        ingredientTally.set(ing, (ingredientTally.get(ing) || 0) + 1);
+      });
     }
 
     mealLineParts.push(`
