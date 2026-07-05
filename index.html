@@ -556,6 +556,24 @@ textarea:focus-visible {
   color: var(--ink);
 }
 
+.ingredient-item {
+  cursor: pointer;
+  border-radius: 4px;
+  transition: color 0.12s ease;
+}
+
+.ingredient-item:hover,
+.ingredient-item:focus-visible {
+  text-decoration: line-through;
+  color: var(--ink-soft);
+}
+
+.ingredients-removed-note {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
 .extra-items-list {
   display: flex;
   flex-direction: column;
@@ -1096,6 +1114,10 @@ const state = {
 let extraItems = [];
 let lastPlan = null;
 
+// Ingredients the person has clicked off the combined shopping list.
+// Session-only — resets whenever the week is (re)planned.
+let removedIngredients = new Set();
+
 // Breakfast/lunch picks are a free-standing list for the week (not tied to
 // a specific day) — each entry is the selected item name, or "" for an
 // empty/unused row. Starts with 2 rows each, matching the default layout.
@@ -1331,6 +1353,7 @@ function buildResults() {
   status.textContent = "";
 
   extraItems = [];
+  removedIngredients = new Set();
   const plan = { dinners: dinnerSelections, breakfasts: breakfastPicks, lunches: lunchPicks };
   lastPlan = plan;
 
@@ -1543,10 +1566,25 @@ function renderWeeklySummary(plan) {
 
   const mealLines = mealLineParts.join("");
 
-  const ingredientLines = Array.from(ingredientTally.entries())
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .map(([name, count]) => `${escapeHtml(name)}${count > 1 ? ` (x${count})` : ""}`)
-    .join("<br>");
+  const ingredientEntries = Array.from(ingredientTally.entries())
+    .filter(([name]) => !removedIngredients.has(name))
+    .sort((a, b) => a[0].localeCompare(b[0]));
+
+  const ingredientLines = ingredientEntries
+    .map(
+      ([name, count]) =>
+        `<div class="ingredient-item" data-ingredient="${encodeURIComponent(name)}" tabindex="0" role="button" aria-label="Remove ${escapeHtml(name)} from shopping list">${escapeHtml(name)}${count > 1 ? ` (x${count})` : ""}</div>`
+    )
+    .join("");
+
+  let ingredientsHtml;
+  if (ingredientTally.size === 0) {
+    ingredientsHtml = "No ingredient data available.";
+  } else if (ingredientEntries.length === 0) {
+    ingredientsHtml = `<span class="ingredients-removed-note">All ingredients removed from the list.</span>`;
+  } else {
+    ingredientsHtml = ingredientLines;
+  }
 
   const missingNote =
     missingCostCount > 0
@@ -1574,7 +1612,7 @@ function renderWeeklySummary(plan) {
     <hr class="receipt-divider">
 
     <div class="receipt-section-title">Combined ingredients</div>
-    <div class="receipt-ingredients">${ingredientLines || "No ingredient data available."}</div>
+    <div class="receipt-ingredients">${ingredientsHtml}</div>
 
     ${missingNote}
 
@@ -1623,6 +1661,13 @@ function handleReceiptClick(e) {
   if (removeId) {
     extraItems = extraItems.filter((item) => item.id !== removeId);
     renderWeeklySummary(lastPlan);
+    return;
+  }
+  const ingredientEl = e.target.closest(".ingredient-item");
+  if (ingredientEl) {
+    const name = decodeURIComponent(ingredientEl.getAttribute("data-ingredient"));
+    removedIngredients.add(name);
+    renderWeeklySummary(lastPlan);
   }
 }
 
@@ -1630,6 +1675,13 @@ function handleReceiptKeydown(e) {
   if (e.key === "Enter" && (e.target.id === "extra-item-name" || e.target.id === "extra-item-cost")) {
     e.preventDefault();
     handleAddExtraItem();
+    return;
+  }
+  if ((e.key === "Enter" || e.key === " ") && e.target.classList.contains("ingredient-item")) {
+    e.preventDefault();
+    const name = decodeURIComponent(e.target.getAttribute("data-ingredient"));
+    removedIngredients.add(name);
+    renderWeeklySummary(lastPlan);
   }
 }
 

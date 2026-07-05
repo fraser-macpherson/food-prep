@@ -82,7 +82,9 @@ a particular day. The weekly receipt lists every pick with a "(Dinner)",
 types together. The "Combined ingredients" shopping list now pulls from
 dinner, lunch, and breakfast recipes alike — an ingredient used in more
 than one of them (worded identically) is combined into a single line with
-a "(x2)" count, same as for repeated dinner ingredients.
+a "(x2)" count, same as for repeated dinner ingredients. Click any
+ingredient in that list (it strikes through on hover) to cross it off and
+remove it from the list — handy for things you already have in.
 
 You can offer as many items as you like in the Breakfast/Lunch dropdowns
 (5 is just what's in the example data, not a hard limit) by adding or
@@ -96,6 +98,13 @@ receipt, you can type in anything else you need to pick up — like milk,
 bread, or snacks — with an optional cost, and it's added to the list and
 (if you gave it a cost) folded into the weekly total. Use the small `×`
 button next to an item to remove it.
+
+The "Combined ingredients" list above it works a little differently, since
+those lines come from recipes rather than being typed in: click directly on
+an ingredient to cross it off and remove it (it shows a strikethrough as
+you hover, as a preview before you click). This doesn't affect the weekly
+total, since ingredients don't carry their own cost — it's just there to
+help you tick off things you already have.
 
 These are session-only: they exist just in your browser for the week you're
 currently planning, aren't saved anywhere, and reset whenever you plan a new
