@@ -138,6 +138,92 @@
       "instructions": "Spread passata over the base, tear over mozzarella, drizzle with oil and bake at 220C for 10-12 mins. Top with fresh basil.",
       "vegetarian": true,
       "cost": 3.60
+    },
+    "Cottage Pie": {
+      "ingredients": [
+        "500g beef mince",
+        "1 onion, diced",
+        "1 carrot, diced",
+        "1 tbsp Worcestershire sauce",
+        "300ml beef stock",
+        "800g potatoes",
+        "50g butter",
+        "50ml milk"
+      ],
+      "instructions": "Brown the mince with the onion and carrot, then stir in the Worcestershire sauce and stock and simmer for 20 mins until thickened. Meanwhile boil the potatoes for 15-20 mins until tender, then mash with the butter and milk. Spoon the mince into a baking dish, top with the mash, and bake at 200C for 20-25 mins until golden on top.",
+      "vegetarian": false,
+      "cost": 5.40
+    },
+    "Chilli Con Carne": {
+      "ingredients": [
+        "500g beef mince",
+        "1 onion, diced",
+        "2 garlic cloves, crushed",
+        "1 tin kidney beans, drained",
+        "1 tin chopped tomatoes",
+        "1 tbsp chilli powder",
+        "1 tsp cumin",
+        "200g rice"
+      ],
+      "instructions": "Brown the mince with the onion and garlic. Stir in the chilli powder and cumin, then add the tomatoes and kidney beans. Simmer for 25-30 mins, stirring occasionally, until rich and thickened. Serve over cooked rice.",
+      "vegetarian": false,
+      "cost": 5.50
+    },
+    "Chicken Fajitas": {
+      "ingredients": [
+        "2 chicken breasts, sliced",
+        "2 peppers, sliced",
+        "1 onion, sliced",
+        "1 tbsp fajita seasoning",
+        "4 tortilla wraps",
+        "Sour cream",
+        "50g cheddar, grated"
+      ],
+      "instructions": "Toss the chicken and vegetables in the fajita seasoning. Fry over a high heat for 8-10 mins until the chicken is cooked through and the vegetables are lightly charred. Warm the tortillas and serve everything together with sour cream and grated cheese for topping.",
+      "vegetarian": false,
+      "cost": 6.90
+    },
+    "Fish & Chips": {
+      "ingredients": [
+        "2 white fish fillets",
+        "800g potatoes, cut into chips",
+        "2 tbsp vegetable oil",
+        "200g peas",
+        "1 lemon"
+      ],
+      "instructions": "Toss the chips in oil and roast at 200C for 30-35 mins, turning halfway, until golden and crisp. Coat the fish fillets in batter or breadcrumbs and bake or fry for the final 12-15 mins until cooked through. Boil the peas for the last 5 mins. Serve with a wedge of lemon.",
+      "vegetarian": false,
+      "cost": 6.40
+    },
+    "Shepherd's Pie": {
+      "ingredients": [
+        "500g lamb mince",
+        "1 onion, diced",
+        "1 carrot, diced",
+        "80g frozen peas",
+        "300ml lamb or beef stock",
+        "800g potatoes",
+        "50g butter",
+        "50ml milk"
+      ],
+      "instructions": "Brown the lamb mince with the onion and carrot, then stir in the stock and simmer for 20 mins. Add the peas for the last 5 mins. Meanwhile boil and mash the potatoes with the butter and milk. Spoon the lamb mixture into a baking dish, top with mash, and bake at 200C for 20-25 mins until golden.",
+      "vegetarian": false,
+      "cost": 6.30
+    },
+    "Thai Green Curry": {
+      "ingredients": [
+        "2 chicken breasts, sliced",
+        "2 tbsp green curry paste",
+        "400ml coconut milk",
+        "1 pepper, sliced",
+        "Handful green beans",
+        "200g rice",
+        "1 tbsp fish sauce",
+        "1/2 lime, juiced"
+      ],
+      "instructions": "Fry the curry paste for a minute until fragrant, then add the chicken and cook until sealed. Pour in the coconut milk and add the pepper and green beans, then simmer for 15 mins until the chicken is cooked through. Stir in fish sauce and lime juice to taste, and serve with rice.",
+      "vegetarian": false,
+      "cost": 6.10
     }
   }
 }

@@ -1,54 +1,117 @@
 {
   "_comment": "Each key is a breakfast item name, shown in the Breakfast dropdown. 'ingredients' is a list of strings and is combined into the shopping list on the results page, same as dinner recipes. 'instructions' is a short method. 'vegetarian' is true or false and controls the green asterisk marker. 'cost' is a plain number, no currency symbol — the 'currency' field in recipes.json sets which symbol is shown for it across the whole site.",
   "items": {
-    "Yoghurt, Berries & Granola": {
+    "Porridge with Berries": {
       "ingredients": [
-        "Greek yoghurt",
-        "granola",
-        "Mixed berries",
-        "Honey"
+        "50g porridge oats",
+        "200ml milk",
+        "Handful mixed berries",
+        "1 tsp honey"
       ],
-      "instructions": "Combine the granola and yoghurt, Top with berries and a drizzle of honey.",
+      "instructions": "Simmer oats in milk for 5 mins, stirring often. Top with berries and a drizzle of honey.",
+      "vegetarian": true,
+      "cost": 1.50
+    },
+    "Toast & Scrambled Eggs": {
+      "ingredients": [
+        "2 slices bread",
+        "2 large eggs",
+        "1 knob butter",
+        "Black pepper"
+      ],
+      "instructions": "Whisk eggs and scramble gently in butter over low heat. Serve with hot buttered toast.",
+      "vegetarian": true,
+      "cost": 1.90
+    },
+    "Greek Yoghurt & Granola": {
+      "ingredients": [
+        "150g Greek yoghurt",
+        "40g granola",
+        "1 tsp honey"
+      ],
+      "instructions": "Spoon yoghurt into a bowl, top with granola and a drizzle of honey.",
       "vegetarian": true,
       "cost": 1.60
     },
-    "Toast & Sread": {
+    "Bacon & Egg Muffin": {
       "ingredients": [
-        "bread",
-        "Spread"
+        "1 English muffin",
+        "2 rashers bacon",
+        "1 large egg",
+        "1 tsp butter"
       ],
-      "instructions": "Toast bread and spread on topping of choice.",
-      "vegetarian": true,
-      "cost": 1.00
-    },
-    "Bacon/Sasuage Roll": {
-      "ingredients": [
-        "Rolls",
-        "Bacon/Sasuage",
-        "Butter"
-      ],
-      "instructions": "Fry the bacon/sasuage and stack inside a buttered roll.",
+      "instructions": "Grill the bacon, fry the egg, and stack both inside a toasted, buttered muffin.",
       "vegetarian": false,
-      "cost": 2.30
+      "cost": 2.40
     },
-    "Pancakes": {
+    "Overnight Oats": {
       "ingredients": [
-        "4oz Self Raising Flour",
-        "2 tbsp sugar",
-        "1 Large Egg",
-        "300ml milk"
+        "50g porridge oats",
+        "150ml milk",
+        "1 tbsp yoghurt",
+        "1 tsp chia seeds",
+        "1 tsp honey"
       ],
-      "instructions": "Mix dry ingredients then add the egg and milk, whisk to combine. Fry the mixture.",
-      "vegetarian": false,
-      "cost": 2.30
-    },
-    "Breakfast Bar": {
-      "ingredients": [
-        "Breakfast Bars",
-      ],
-      "instructions": " ",
+      "instructions": "Stir everything together in a jar and refrigerate overnight. Eat cold, straight from the jar.",
       "vegetarian": true,
       "cost": 1.40
+    },
+    "Avocado on Toast": {
+      "ingredients": [
+        "2 slices bread",
+        "1 ripe avocado",
+        "1/2 lemon, juiced",
+        "Pinch chilli flakes",
+        "Salt and pepper"
+      ],
+      "instructions": "Toast the bread. Mash the avocado with lemon juice, salt and pepper, then spread on top and finish with chilli flakes.",
+      "vegetarian": true,
+      "cost": 1.60
+    },
+    "Full English Breakfast": {
+      "ingredients": [
+        "2 sausages",
+        "2 rashers bacon",
+        "1 large egg",
+        "1/2 tin baked beans",
+        "1 tomato, halved",
+        "2 slices bread"
+      ],
+      "instructions": "Grill the sausages and bacon, fry or grill the tomato, fry the egg, and warm the beans. Serve with buttered toast.",
+      "vegetarian": false,
+      "cost": 3.20
+    },
+    "Pancakes with Maple Syrup": {
+      "ingredients": [
+        "150g plain flour",
+        "2 large eggs",
+        "200ml milk",
+        "1 knob butter",
+        "2 tbsp maple syrup"
+      ],
+      "instructions": "Whisk flour, eggs and milk into a smooth batter. Fry small ladlefuls in a buttered pan until bubbles form, then flip. Serve stacked with maple syrup.",
+      "vegetarian": true,
+      "cost": 1.50
+    },
+    "Bagel with Cream Cheese": {
+      "ingredients": [
+        "1 bagel",
+        "2 tbsp cream cheese"
+      ],
+      "instructions": "Slice and toast the bagel, then spread generously with cream cheese.",
+      "vegetarian": true,
+      "cost": 1.20
+    },
+    "Berry & Banana Smoothie": {
+      "ingredients": [
+        "1 banana",
+        "Handful frozen mixed berries",
+        "150ml Greek yoghurt",
+        "100ml milk"
+      ],
+      "instructions": "Blend all the ingredients together until smooth, adding a splash more milk if it's too thick.",
+      "vegetarian": true,
+      "cost": 1.70
     }
   }
 }

@@ -59,6 +59,60 @@
       "instructions": "Spread hummus over the wrap, add salad, onion and falafel, then roll up tightly.",
       "vegetarian": true,
       "cost": 2.60
+    },
+    "Jacket Potato with Cheese & Beans": {
+      "ingredients": [
+        "1 baking potato",
+        "50g cheddar, grated",
+        "1/2 tin baked beans"
+      ],
+      "instructions": "Bake or microwave the potato until soft, split open, and top with warmed beans and grated cheese.",
+      "vegetarian": true,
+      "cost": 1.30
+    },
+    "BLT Sandwich": {
+      "ingredients": [
+        "2 slices bread",
+        "2 rashers bacon",
+        "Handful lettuce",
+        "1 tomato, sliced",
+        "1 tbsp mayonnaise"
+      ],
+      "instructions": "Grill the bacon until crisp. Spread mayonnaise on the bread, then layer bacon, lettuce and tomato.",
+      "vegetarian": false,
+      "cost": 2.00
+    },
+    "Egg Mayo Sandwich": {
+      "ingredients": [
+        "2 slices bread",
+        "2 large eggs",
+        "1 tbsp mayonnaise",
+        "Handful lettuce"
+      ],
+      "instructions": "Hard-boil and chop the eggs, mix with mayonnaise, then pile onto the bread with lettuce.",
+      "vegetarian": true,
+      "cost": 1.30
+    },
+    "Cheese & Pickle Sandwich": {
+      "ingredients": [
+        "2 slices bread",
+        "40g cheddar, sliced",
+        "1 tbsp pickle"
+      ],
+      "instructions": "Spread pickle over one slice of bread, layer with cheese, and top with the second slice.",
+      "vegetarian": true,
+      "cost": 1.20
+    },
+    "Chicken & Sweetcorn Soup": {
+      "ingredients": [
+        "1 cooked chicken breast, shredded",
+        "3 tbsp sweetcorn",
+        "500ml chicken stock",
+        "1 bread roll"
+      ],
+      "instructions": "Simmer the stock, sweetcorn and shredded chicken together for 5 mins. Serve hot with the bread roll.",
+      "vegetarian": false,
+      "cost": 2.30
     }
   }
 }
