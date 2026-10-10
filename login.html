@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign in — Weekly Meal Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===========================================================
+   Weekly Meal Plan — tokens
+   Subject: a kitchen noticeboard. Day picks live on index cards,
+   the week's shop prints out like a till receipt.
+=========================================================== */
+:root {
+  --bg: #EEF1E2;
+  --card: #FFFCF5;
+  --ink: #233224;
+  --ink-soft: #5C6B57;
+  --line: #CBD2B8;
+  --accent: #2F5D8A;
+  --accent-dark: #1E4264;
+  --error: #B3261E;
+  --error-bg: #FBEAE8;
+  --error-line: #ECC2BC;
+  --success: #27513A;
+  --success-bg: #E9F2EC;
+  --success-line: #BFDFCB;
+  --sage-deep: #4B6358;
+  --veg-green: #2E7D46;
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+
+  --radius: 14px;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(35,50,36,0.07) 1px, transparent 0);
+  background-size: 22px 22px;
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+}
+
+/* ---------- Focus & motion ---------- */
+a:focus-visible,
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+  html { scroll-behavior: auto; }
+}
+
+/* ---------- Nav ---------- */
+.site-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-bottom: 22px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--line);
+}
+
+.nav-logo {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.nav-link {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--ink-soft);
+  padding: 9px 16px;
+  border-radius: 999px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.nav-link:hover {
+  background: rgba(35, 50, 36, 0.07);
+  color: var(--ink);
+}
+
+.nav-link.is-active {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* ---------- Header ---------- */
+.site-header {
+  margin-bottom: 40px;
+  max-width: 640px;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.75rem;
+  color: var(--accent-dark);
+  margin: 0 0 10px;
+  font-weight: 600;
+}
+
+.site-header h1 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2.2rem, 5vw, 3.2rem);
+  line-height: 1.05;
+  margin: 0 0 14px;
+  color: var(--ink);
+}
+
+.subhead {
+  font-size: 1.05rem;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+/* ---------- Vegetarian marker ---------- */
+.veg-marker {
+  color: var(--veg-green);
+  font-weight: 700;
+  margin-left: 2px;
+}
+
+.veg-legend {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  margin: 10px 0 0;
+}
+
+.veg-legend .veg-marker { font-size: 0.95rem; }
+
+/* ---------- View toggling ---------- */
+.view[hidden] { display: none; }
+
+/* ---------- Card rack (day cards / daily breakdown) ---------- */
+.card-rack {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 18px;
+  margin-bottom: 32px;
+}
+
+.day-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 1px 0 rgba(35, 50, 36, 0.04);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.day-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 18px -10px rgba(35, 50, 36, 0.25);
+}
+
+.day-card .day-label {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  color: var(--sage-deep);
+}
+
+.day-select {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--ink);
+  background: #fff;
+  border: 1.5px solid var(--line);
+  border-radius: 9px;
+  padding: 10px 10px;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--ink-soft) 50%),
+                     linear-gradient(135deg, var(--ink-soft) 50%, transparent 50%);
+  background-position: calc(100% - 16px) calc(1em + 2px), calc(100% - 11px) calc(1em + 2px);
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+
+.day-select:focus {
+  border-color: var(--accent);
+}
+
+.day-select option.veg-option {
+  color: var(--veg-green);
+  font-weight: 600;
+}
+
+.select-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.meal-type-label {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+}
+
+/* ---------- Planner actions ---------- */
+.planner-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.status-text {
+  font-size: 0.9rem;
+  color: var(--accent-dark);
+  margin: 0;
+  min-height: 1.2em;
+}
+
+.stamp-btn {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  border-radius: 999px;
+  padding: 14px 32px;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: transform 0.12s ease, background 0.12s ease;
+  box-shadow: 0 6px 0 var(--accent-dark);
+}
+
+.stamp-btn:hover { background: #2A547C; }
+.stamp-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 var(--accent-dark);
+}
+
+.stamp-btn:disabled {
+  background: var(--line);
+  box-shadow: 0 6px 0 #b3b9a0;
+  cursor: not-allowed;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--sage-deep);
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 4px;
+}
+
+/* ---------- Results heading ---------- */
+.results-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+.results-heading h2 {
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  margin: 0;
+}
+
+/* ---------- Daily breakdown cards ---------- */
+.recipe-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.recipe-card .day-label {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  color: var(--sage-deep);
+}
+
+.recipe-card .meal-name {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--ink);
+}
+
+.recipe-card .meal-cost {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--accent-dark);
+  font-weight: 600;
+}
+
+.recipe-card .meal-instructions {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+.recipe-card .ingredient-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.82rem;
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.recipe-card .missing-note {
+  font-size: 0.82rem;
+  color: var(--error);
+  font-style: italic;
+}
+
+.recipe-card.empty-day {
+  opacity: 0.6;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.recipe-card .meal-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.recipe-card .meal-block + .meal-block {
+  margin-top: 4px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--line);
+}
+
+.recipe-card .meal-type-label {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--sage-deep);
+}
+
+/* ---------- Receipt (weekly summary) ---------- */
+.receipt-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.receipt {
+  width: 100%;
+  max-width: 420px;
+  background: #FFFEFA;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 28px 26px 26px;
+  font-family: var(--font-mono);
+  color: var(--ink);
+  position: relative;
+  box-shadow: 0 14px 28px -16px rgba(35, 50, 36, 0.35);
+}
+
+.receipt::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -9px;
+  height: 18px;
+  background:
+    linear-gradient(135deg, #FFFEFA 50%, transparent 50%) 0 0,
+    linear-gradient(45deg, #FFFEFA 50%, transparent 50%) 0 0;
+  background-size: 16px 18px;
+  background-repeat: repeat-x;
+}
+
+.receipt h3 {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.8rem;
+  text-align: center;
+  margin: 0 0 4px;
+}
+
+.receipt .receipt-sub {
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--ink-soft);
+  margin: 0 0 16px;
+}
+
+.receipt-divider {
+  border: none;
+  border-top: 1px dashed var(--line);
+  margin: 14px 0;
+}
+
+.receipt-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.82rem;
+  padding: 3px 0;
+}
+
+.receipt-line .label { color: var(--ink); }
+.receipt-line .value { color: var(--ink-soft); white-space: nowrap; }
+
+.receipt-meal-type {
+  font-size: 0.68rem;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+.receipt-section-title {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--sage-deep);
+  margin: 16px 0 6px;
+}
+
+.receipt-ingredients {
+  font-size: 0.8rem;
+  line-height: 1.7;
+  color: var(--ink);
+}
+
+.extra-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.extra-item-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  padding: 3px 0;
+}
+
+.extra-item-name {
+  flex: 1;
+  color: var(--ink);
+}
+
+.extra-item-cost {
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.remove-extra-btn {
+  background: none;
+  border: none;
+  color: var(--ink-soft);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0 2px;
+}
+
+.remove-extra-btn:hover {
+  color: var(--error);
+}
+
+.extra-item-form {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.extra-item-input {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  padding: 7px 9px;
+  border: 1.5px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--ink);
+}
+
+.extra-item-cost-input {
+  width: 72px;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  padding: 7px 9px;
+  border: 1.5px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--ink);
+}
+
+.extra-item-input:focus,
+.extra-item-cost-input:focus {
+  border-color: var(--accent);
+}
+
+.extra-item-add-btn {
+  font-family: var(--font-body);
+  font-weight: 600;
+  padding: 7px 14px;
+  white-space: nowrap;
+}
+
+.receipt-total {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 2px solid var(--ink);
+}
+
+.receipt-total .value { color: var(--accent-dark); }
+
+/* ---------- Admin / form page ---------- */
+.admin-note {
+  background: #EAF0F5;
+  border: 1px solid #C9D8E4;
+  color: var(--accent-dark);
+  font-size: 0.85rem;
+  border-radius: 10px;
+  padding: 14px 16px;
+  max-width: 640px;
+  margin: 0 0 28px;
+}
+
+.form-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 28px;
+  max-width: 640px;
+  margin: 0 0 32px;
+}
+
+.form-card h2 {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  margin: 0 0 4px;
+}
+
+.form-card .form-intro {
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+  margin: 0 0 24px;
+}
+
+.field {
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--sage-deep);
+  font-weight: 600;
+}
+
+.field input[type="text"],
+.field input[type="number"],
+.field input[type="password"],
+.field textarea {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 11px 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 9px;
+  background: #fff;
+  color: var(--ink);
+  width: 100%;
+}
+
+.field input:focus,
+.field textarea:focus {
+  border-color: var(--accent);
+}
+
+.field textarea {
+  resize: vertical;
+  min-height: 84px;
+  font-family: var(--font-body);
+}
+
+.field-hint {
+  font-size: 0.76rem;
+  color: var(--ink-soft);
+}
+
+.field-error {
+  font-size: 0.78rem;
+  color: var(--error);
+  min-height: 1.1em;
+}
+
+.field.has-error input,
+.field.has-error textarea {
+  border-color: var(--error);
+}
+
+.checkbox-field {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.checkbox-field input[type="checkbox"] {
+  width: 19px;
+  height: 19px;
+  accent-color: var(--veg-green);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.checkbox-field label {
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.ingredient-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.ingredient-row input { flex: 1; }
+
+.remove-ingredient-btn {
+  background: none;
+  border: 1.5px solid var(--line);
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--ink-soft);
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.remove-ingredient-btn:hover {
+  border-color: var(--error);
+  color: var(--error);
+}
+
+.add-ingredient-btn {
+  align-self: flex-start;
+  background: none;
+  border: 1.5px dashed var(--line);
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--sage-deep);
+  cursor: pointer;
+  margin-top: 2px;
+}
+
+.add-ingredient-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.cost-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.currency-symbol {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.secondary-btn {
+  background: #fff;
+  border: 1.5px solid var(--line);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 11px 22px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.secondary-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent-dark);
+}
+
+.form-banner {
+  font-size: 0.85rem;
+  padding: 12px 14px;
+  border-radius: 9px;
+  margin-bottom: 18px;
+}
+
+.form-banner.error {
+  background: var(--error-bg);
+  color: var(--error);
+  border: 1px solid var(--error-line);
+}
+
+.form-banner.success {
+  background: var(--success-bg);
+  color: var(--success);
+  border: 1px solid var(--success-line);
+}
+
+.pending-list {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  margin: 0 0 18px;
+}
+
+.pending-list strong { color: var(--ink); }
+
+.output-section {
+  max-width: 640px;
+}
+
+.output-section h2 {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  margin: 0 0 16px;
+}
+
+.output-block { margin-bottom: 22px; }
+
+.output-block h4 {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--sage-deep);
+  margin: 0 0 8px;
+}
+
+.code-box {
+  background: #1F2B20;
+  color: #E9EEE2;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  padding: 14px;
+  border-radius: 9px;
+  max-height: 240px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+}
+
+.output-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.tiny-btn {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 7px 12px;
+  cursor: pointer;
+  color: var(--ink-soft);
+}
+
+.tiny-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent-dark);
+}
+
+/* ---------- Footer ---------- */
+.site-footer {
+  margin-top: 56px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.site-footer p { margin: 0; max-width: 560px; }
+
+.site-footer code {
+  font-family: var(--font-mono);
+  background: rgba(35, 50, 36, 0.07);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.site-footer a {
+  color: var(--accent-dark);
+  font-weight: 600;
+}
+
+.site-footer .footer-links {
+  display: flex;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+.site-footer .footer-links a {
+  color: var(--accent-dark);
+  text-decoration: underline;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 600px) {
+  .page { padding: 24px 16px 60px; }
+  .card-rack { grid-template-columns: repeat(2, 1fr); }
+  .stamp-btn { width: 100%; }
+  .planner-actions { flex-direction: column; align-items: stretch; }
+  .form-card { padding: 20px; }
+  .site-footer { flex-direction: column; }
+}</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="supabase-config.js"></script>
+</head>
+<body>
+
+<div class="page">
+
+  <nav class="site-nav">
+    <a href="index.html" class="nav-logo">Weekly Meal Plan</a>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Plan the week</a>
+      <span class="nav-auth" id="auth-nav"></span>
+    </div>
+  </nav>
+
+  <header class="site-header">
+    <p class="eyebrow">Members</p>
+    <h1>Sign in</h1>
+    <p class="subhead">Sign in to add your own recipes to the planner. Browsing and planning doesn't need an account.</p>
+  </header>
+
+  <div id="config-warning" class="form-banner error" hidden>
+    Supabase isn't set up yet. Fill in your project URL and key in <code>supabase-config.js</code>.
+  </div>
+
+  <form id="login-form" class="form-card login-card" novalidate>
+    <h2>Member sign in</h2>
+    <p class="form-intro">Accounts are created by the site owner.</p>
+
+    <div id="form-banner-area" aria-live="polite"></div>
+
+    <div class="field" id="field-email">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" autocomplete="username" required>
+      <p class="field-error" id="error-email"></p>
+    </div>
+
+    <div class="field" id="field-password">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" autocomplete="current-password" required>
+      <p class="field-error" id="error-password"></p>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="stamp-btn" id="login-submit">Sign in</button>
+    </div>
+  </form>
+
+  <footer class="site-footer">
+    <p>Don't have an account? Ask whoever runs this site to add you.</p>
+    <div class="footer-links">
+      <a href="index.html">&larr; Plan the week</a>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+/* ===========================================================
+   Sign in — uses Supabase Auth (email + password), the same accounts
+   you manage under Authentication -> Users in the Supabase dashboard.
+=========================================================== */
+
+function setFieldError(key, message) {
+  const field = document.getElementById(`field-${key}`);
+  field.classList.toggle("has-error", !!message);
+  document.getElementById(`error-${key}`).textContent = message || "";
+}
+
+function showBanner(type, message) {
+  const area = document.getElementById("form-banner-area");
+  area.innerHTML = "";
+  const div = document.createElement("div");
+  div.className = `form-banner ${type}`;
+  div.textContent = message;
+  area.appendChild(div);
+}
+
+// Only ever redirect to our own pages — never to an arbitrary ?next= value.
+function nextPage() {
+  const next = new URLSearchParams(location.search).get("next");
+  return ["add.html", "index.html"].includes(next) ? next : "index.html";
+}
+
+async function handleLogin(e) {
+  e.preventDefault();
+  setFieldError("email", "");
+  setFieldError("password", "");
+  document.getElementById("form-banner-area").innerHTML = "";
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  let ok = true;
+  if (!email) { setFieldError("email", "Enter your email."); ok = false; }
+  if (!password) { setFieldError("password", "Enter your password."); ok = false; }
+  if (!ok) return;
+
+  const btn = document.getElementById("login-submit");
+  btn.disabled = true;
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  btn.disabled = false;
+
+  if (error) {
+    console.error(error);
+    if (/not confirmed/i.test(error.message || "")) {
+      showBanner("error", "This account's email hasn't been confirmed yet. Ask the site owner to confirm it.");
+    } else if (error.status === 400 || /invalid login/i.test(error.message || "")) {
+      showBanner("error", "That email and password don't match an account.");
+    } else {
+      showBanner("error", "Couldn't sign in. Check your connection and try again.");
+    }
+    return;
+  }
+
+  location.href = nextPage();
+}
+
+(async function init() {
+  if (!sb) {
+    document.getElementById("config-warning").hidden = false;
+    document.getElementById("login-form").hidden = true;
+    return;
+  }
+  const user = await getCurrentUser();
+  if (user) {
+    location.replace(nextPage());
+    return;
+  }
+  renderAuthNav("login");
+  document.getElementById("login-form").addEventListener("submit", handleLogin);
+})();
+</script>
+</body>
+</html>

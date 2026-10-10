@@ -8,24 +8,22 @@ items (like milk or bread) to the shopping list on the results page.
 
 ## Files
 
-- `index.html` — the planner: markup, styling, and behaviour all live in this
-  one file, so there are no separate CSS/JS paths that can go missing when
-  uploading.
-- `add.html` — a password-gated page for putting together a request for a
-  new dinner meal (recipe + ingredients + cost + vegetarian or not) without
-  hand-editing the JSON files. Also fully self-contained.
-- `data/meals.json` — the list of dinner meals offered in every day's
-  dropdown.
-- `data/recipes.json` — ingredients, a short method, a vegetarian true/false
-  flag, and the cost, all together for each dinner meal.
-- `data/lunch.json` — ingredients, a short method, a vegetarian true/false
-  flag, and the cost for each of the (up to) 5 lunch options offered in
-  their own dropdown.
-- `data/breakfast.json` — ingredients, a short method, a vegetarian
-  true/false flag, and the cost for each of the (up to) 5 breakfast options
-  offered in their own dropdown.
-- `.nojekyll` — tells GitHub Pages to serve the files as-is, without running
-  them through Jekyll first. Keep this file even though it looks empty.
+- `index.html` — the planner: markup, styling, and behaviour in one file.
+  It also loads recipes that members added through the website and shows
+  "Added by ..." on their recipe cards.
+- `login.html` — member sign-in (Supabase Auth, email + password).
+- `add.html` — members-only page for adding a breakfast, lunch or dinner
+  (name, ingredients, method, cost, vegetarian or not). Redirects to
+  `login.html` if nobody is signed in.
+- `supabase-config.js` — your Supabase project URL + public key, plus the
+  small shared sign-in helpers every page uses. **Edit this file first.**
+- `supabase-setup.sql` — run once in the Supabase SQL Editor. Creates the
+  tables, the security rules and the "who added it" tracking. Not uploaded
+  to GitHub Pages (keep it in the repo or elsewhere for reference).
+- `data/meals.json`, `data/recipes.json`, `data/lunch.json`,
+  `data/breakfast.json` — the built-in meals, unchanged (see below).
+- `.nojekyll` — tells GitHub Pages to serve the files as-is. Keep it even
+  though it looks empty.
 
 **The meal name is the link between the dinner data files.** A meal in
 `meals.json` only shows a recipe and a cost if the exact same name also
@@ -110,72 +108,76 @@ These are session-only: they exist just in your browser for the week you're
 currently planning, aren't saved anywhere, and reset whenever you plan a new
 week. They're for quick additions on the fly, not for changing what's
 offered in the dropdowns — for that, edit `lunch.json` or `breakfast.json`,
-or use the Add options page (for dinner meals) instead.
+or sign in and use the Add recipe page instead.
 
-## Requesting new meals through the website
+## Accounts and member recipes (Supabase)
 
-`add.html` (linked from the nav bar and footer as **Add options**) gives you
-a form for putting together a request for a new **dinner** meal — its
-recipe, ingredients, cost, and whether it's vegetarian — with built-in
-validation. (Lunch and breakfast items don't have a request form since
-they're simple enough to add directly in `lunch.json` or `breakfast.json`
-— see below.)
+### How it fits together
 
-- **Shared password** — required, and masked as you type. The page checks it
-  against a stored hash rather than a plain-text value.
-- **Meal name** — required, and checked against the meals already loaded so
-  you can't accidentally create a duplicate.
-- **Ingredients** — add as many rows as you need; at least one non-empty
-  ingredient is required.
-- **Method** — required.
-- **Cost** — required, must be a number greater than 0.
-- **Vegetarian** — an optional checkbox; leave it unchecked if the meal isn't
-  vegetarian.
+- **Reading is public.** Anyone visiting the site sees the built-in JSON
+  meals *and* every recipe members have added. Member recipes appear in the
+  same dropdowns, recipe cards, receipt and shopping list as built-in ones.
+- **Writing needs an account.** Only signed-in users can add recipes, and
+  only as themselves. Users can delete their own recipes but nobody else's.
+  These rules are enforced by the database (Row Level Security), not just by
+  the page, so they hold even if someone pokes at the site's code.
+- **Who added what.** Each recipe row stores the adding user's id
+  automatically. The planner shows "Added by <name>" on recipe cards, and the
+  Add recipe page lists every member recipe with its author and date.
+- **Built-in meals stay in JSON** and show no "Added by" line. If a member
+  adds a recipe with the same name as a built-in one of the same type, it's
+  listed as "Name (by Sam)" so both are kept.
 
-After a successful submit, the page shows the fully updated contents of
-`meals.json` and `recipes.json` (the existing data plus the new meal,
-correctly cross-linked between the two, with its cost and vegetarian flag
-included right in the recipe entry). Copy or download each part and send it
-to whoever manages the site so they can add it — the page itself only
-prepares the request, it doesn't publish anything on its own. You can add
-several meals to one request before sending anything — each addition builds
-on the last within that browser session.
+### One-time setup
 
-### Why requests aren't published automatically
+1. **Supabase project.** Use an existing project or create one at
+   supabase.com. Tables are prefixed `meal_` so they won't clash with another
+   app (such as an asset tracker) in the same project.
+2. **Run the SQL.** Dashboard → SQL Editor → New query → paste the contents of
+   `supabase-setup.sql` → Run. It's safe to run again.
+3. **Turn off public sign-ups.** Dashboard → Authentication → Sign In /
+   Providers (older dashboards: Settings) → switch off **Allow new users to
+   sign up**. This matters: the public key is visible in the site's code, so
+   with sign-ups on, anyone could create an account and add recipes.
+4. **Add your users.** Dashboard → Authentication → Users → Add user →
+   Create new user. Enter email + password and tick **Auto Confirm User** so
+   they can sign in straight away. A profile row is created automatically.
+   To control the name shown as "Added by", open the user's metadata (or
+   create them with user metadata `{"display_name": "Sam"}`); otherwise it
+   defaults to the part of their email before the `@`, which is visible to
+   all visitors.
+5. **Connect the site.** Dashboard → Project Settings → API (or "API Keys").
+   Copy the **Project URL** and the **anon / publishable** key into
+   `supabase-config.js`. Never use the `service_role` / secret key there.
+6. **Upload** `index.html`, `login.html`, `add.html`, `supabase-config.js`,
+   the `data/` folder and `.nojekyll` to GitHub Pages as before.
+7. **Allow your site's address.** Dashboard → Authentication → URL
+   Configuration → set Site URL to your GitHub Pages address. (Only needed
+   for email links like password resets, but good practice.)
 
-This is a note for whoever maintains the site — it's deliberately left off
-the page itself to keep things simple for anyone filling in a request.
-GitHub Pages only serves static files; it can't run server code or write to
-your repository. That's why `add.html` can only prepare a correctly
-formatted request rather than publish it — you (or whoever has repo access)
-still need to take the copied or downloaded JSON and commit it to `data/` to
-make a requested meal live.
+### Day to day
 
-### About the password
+- **Members:** open **Sign in**, then **Add recipe** appears in the nav bar.
+  Pick Breakfast / Lunch / Dinner, fill in the form, and the recipe is live
+  immediately for everyone.
+- **You (the owner):**
+  - Add or remove users in Authentication → Users.
+  - See who added what: SQL Editor →
+    `select * from public.meal_recipes_admin;` (includes emails; this view
+    is blocked from the website's roles so emails are never exposed).
+  - Remove a bad recipe: Table Editor → `meal_recipes` → delete the row.
+  - Rename someone's "Added by": see the SQL comment at the bottom of
+    `supabase-setup.sql`.
 
-Because this is a public static site, there's no real backend to enforce
-permissions — anyone who looks at the page's source could, in principle,
-find a way to bypass a client-side check. Hashing the password (instead of
-storing it as plain text) stops it being casually visible in the page
-source, but **treat this as a basic deterrent, not real security.** Don't
-use a password you use anywhere else, and don't rely on this to protect
-anything sensitive.
+### Good to know
 
-The default password is `mealprep2026`. To change it:
-
-1. Open `add.html` in a browser.
-2. Open the browser's developer console (e.g. F12, or right-click →
-   Inspect → Console).
-3. Run:
-   ```js
-   crypto.subtle.digest('SHA-256', new TextEncoder().encode('yourNewPassword'))
-     .then(b => console.log(Array.from(new Uint8Array(b))
-       .map(x => x.toString(16).padStart(2, '0')).join('')))
-   ```
-4. Copy the hash that gets printed.
-5. In `add.html`, find the line starting `const PASSWORD_HASH = ` near the
-   top of the `<script>` block, and replace the value with your new hash.
-6. Commit the updated `add.html`.
+- Passwords are handled entirely by Supabase Auth; the site never stores them.
+- Sessions persist in the browser, so members stay signed in until they click
+  **Sign out**.
+- Recipes can be added and deleted from the site but not edited; to fix a
+  typo, delete and re-add it (or edit the row in the Table Editor).
+- The old password-gated "request" flow and the `PASSWORD_HASH` have been
+  removed.
 
 ## Editing the data directly
 
@@ -256,9 +258,9 @@ dropdown. Add, remove, or rename entries freely.
 
 If you ever want to change the look of the page or the dropdown/results
 behaviour, the styling lives in the `<style>` block and the logic lives in
-the `<script>` block at the bottom of `index.html`. `add.html` has its own
-matching `<style>` and `<script>` blocks — if you change the look of one
-page, update the other to match.
+the `<script>` block at the bottom of `index.html`. `add.html` and
+`login.html` have their own matching `<style>` blocks — if you change the
+look of one page, update the others to match.
 
 ## Important: this must be served over http://, not opened as a file
 
@@ -279,23 +281,18 @@ site correctly automatically, so once it's published this isn't a concern.
 
 ## Publishing on GitHub Pages
 
-1. Create a new GitHub repository.
-2. Upload **all four items** from this folder — `index.html`, `add.html`,
-   the `data/` folder (with its four `.json` files inside), and
-   `.nojekyll` — keeping `index.html`, `add.html`, and `.nojekyll` at the
-   root of the repository, and `data/` as a folder alongside them. If you're
-   using GitHub's web upload, drag the whole `data` folder in at once rather
-   than the files individually, so its folder structure is preserved.
-3. In the repository, go to **Settings → Pages**.
-4. Under **Build and deployment**, set **Source** to "Deploy from a branch",
-   choose the branch (usually `main`) and `/ (root)` as the folder, then save.
-5. GitHub will give you a URL (usually
-   `https://<your-username>.github.io/<repo-name>/`) — the site is live there
-   within a minute or two, with the planner at that address and the add page
-   at the same address plus `add.html`.
-6. From then on, editing any of the `data/*.json` files in the repo and
-   committing the change is all it takes to update the live site — no
-   rebuild step required.
+1. Complete the Supabase setup above.
+2. Create a new GitHub repository.
+3. Upload `index.html`, `login.html`, `add.html`, `supabase-config.js`, the
+   `data/` folder (with its four `.json` files) and `.nojekyll`, all at the
+   root. If you're using GitHub's web upload, drag the whole `data` folder
+   in at once so its structure is preserved.
+4. Settings → Pages → Source "Deploy from a branch", choose `main` and
+   `/ (root)`, then save.
+5. The site is live at `https://<your-username>.github.io/<repo-name>/`
+   within a minute or two.
+6. Built-in meals: edit `data/*.json` and commit. Member recipes need no
+   commit — they're stored in Supabase.
 
 ## Notes on behaviour
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Add Options &mdash; Weekly Meal Plan</title>
+<title>Add a recipe — Weekly Meal Plan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -907,6 +907,8 @@ textarea:focus-visible {
   .form-card { padding: 20px; }
   .site-footer { flex-direction: column; }
 }</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="supabase-config.js"></script>
 </head>
 <body>
 
@@ -916,99 +918,87 @@ textarea:focus-visible {
     <a href="index.html" class="nav-logo">Weekly Meal Plan</a>
     <div class="nav-links">
       <a href="index.html" class="nav-link">Plan the week</a>
-      <a href="add.html" class="nav-link is-active" aria-current="page">Add options</a>
+      <span class="nav-auth" id="auth-nav"></span>
     </div>
   </nav>
 
-  <header class="site-header">
-    <p class="eyebrow">Admin</p>
-    <h1>Request a new meal</h1>
-    <p class="subhead">Put together everything needed for a new meal &mdash; its recipe, ingredients, cost and whether it's vegetarian. You'll need the shared password to continue.</p>
-  </header>
-
-  <div class="admin-note">
-    <strong>How this works:</strong> fill in the form below to put together a request for a new meal. Once you submit, you'll get the details in the exact format needed to add it to the site. Copy or download that, then send it to whoever manages the Weekly Meal Plan so they can add it for you.
+  <div id="config-warning" class="form-banner error" hidden>
+    Supabase isn't set up yet. Fill in your project URL and key in <code>supabase-config.js</code>.
   </div>
 
-  <form id="add-meal-form" class="form-card" novalidate>
-    <h2>Meal details</h2>
-    <p class="form-intro">All fields are required.</p>
+  <div id="add-view" hidden>
+    <header class="site-header">
+      <p class="eyebrow">Members</p>
+      <h1>Add a recipe</h1>
+      <p class="subhead">Share a breakfast, lunch or dinner. It goes straight into the planner for everyone, with your name on it.</p>
+    </header>
 
-    <div id="form-banner-area"></div>
+    <form id="add-meal-form" class="form-card" novalidate>
+      <h2>Recipe details</h2>
+      <p class="form-intro">All fields are required.</p>
 
-    <div class="field" id="field-password">
-      <label for="password">Shared password</label>
-      <input type="password" id="password" name="password" autocomplete="off" required>
-      <p class="field-error" id="error-password"></p>
-    </div>
+      <div id="form-banner-area" aria-live="polite"></div>
 
-    <div class="field" id="field-name">
-      <label for="meal-name">Meal name</label>
-      <input type="text" id="meal-name" name="meal-name" required>
-      <p class="field-hint">Must be unique &mdash; this name links the meal across all three files.</p>
-      <p class="field-error" id="error-name"></p>
-    </div>
-
-    <div class="field" id="field-ingredients">
-      <label>Ingredients</label>
-      <div id="ingredient-rows"><!-- rows injected by script --></div>
-      <button type="button" class="add-ingredient-btn" id="add-ingredient-btn">+ Add ingredient</button>
-      <p class="field-error" id="error-ingredients"></p>
-    </div>
-
-    <div class="field" id="field-instructions">
-      <label for="instructions">Method</label>
-      <textarea id="instructions" name="instructions" required placeholder="A short, step-by-step method."></textarea>
-      <p class="field-error" id="error-instructions"></p>
-    </div>
-
-    <div class="field" id="field-cost">
-      <label for="cost">Cost</label>
-      <div class="cost-input-wrap">
-        <span class="currency-symbol" id="currency-symbol">£</span>
-        <input type="number" id="cost" name="cost" min="0.01" step="0.01" required placeholder="0.00">
+      <div class="field" id="field-type">
+        <label id="type-label">Meal type</label>
+        <div class="type-options" role="radiogroup" aria-labelledby="type-label">
+          <label class="type-option"><input type="radio" name="meal-type" value="breakfast"><span>Breakfast</span></label>
+          <label class="type-option"><input type="radio" name="meal-type" value="lunch"><span>Lunch</span></label>
+          <label class="type-option"><input type="radio" name="meal-type" value="dinner"><span>Dinner</span></label>
+        </div>
+        <p class="field-error" id="error-type"></p>
       </div>
-      <p class="field-error" id="error-cost"></p>
-    </div>
 
-    <div class="field checkbox-field" id="field-vegetarian">
-      <input type="checkbox" id="vegetarian" name="vegetarian">
-      <label for="vegetarian">This meal is vegetarian <span class="veg-marker" title="Vegetarian">*</span></label>
-    </div>
-
-    <div class="form-actions">
-      <button type="submit" class="stamp-btn" id="add-meal-submit">Add to request</button>
-      <button type="button" class="secondary-btn" id="reset-form-btn">Start over</button>
-    </div>
-  </form>
-
-  <p class="pending-list" id="pending-list" hidden></p>
-
-  <section class="output-section" id="output-section" hidden>
-    <h2>Your request</h2>
-    <p class="form-intro">Copy or download each part below, then send them to whoever manages this site to request the addition.</p>
-
-    <div class="output-block">
-      <h4>data/meals.json</h4>
-      <pre class="code-box" id="output-meals"></pre>
-      <div class="output-actions">
-        <button class="tiny-btn" type="button" data-copy="output-meals">Copy</button>
-        <button class="tiny-btn" type="button" data-download="meals.json" data-source="output-meals">Download</button>
+      <div class="field" id="field-name">
+        <label for="meal-name">Meal name</label>
+        <input type="text" id="meal-name" name="meal-name" maxlength="100" required>
+        <p class="field-hint">Must be unique within its meal type.</p>
+        <p class="field-error" id="error-name"></p>
       </div>
-    </div>
 
-    <div class="output-block">
-      <h4>data/recipes.json</h4>
-      <pre class="code-box" id="output-recipes"></pre>
-      <div class="output-actions">
-        <button class="tiny-btn" type="button" data-copy="output-recipes">Copy</button>
-        <button class="tiny-btn" type="button" data-download="recipes.json" data-source="output-recipes">Download</button>
+      <div class="field" id="field-ingredients">
+        <label>Ingredients</label>
+        <div id="ingredient-rows"><!-- rows injected by script --></div>
+        <button type="button" class="add-ingredient-btn" id="add-ingredient-btn">+ Add ingredient</button>
+        <p class="field-hint">Spell repeated ingredients identically (e.g. &ldquo;1 onion&rdquo;) so the shopping list can combine them.</p>
+        <p class="field-error" id="error-ingredients"></p>
       </div>
-    </div>
-  </section>
+
+      <div class="field" id="field-instructions">
+        <label for="instructions">Method</label>
+        <textarea id="instructions" name="instructions" maxlength="4000" required placeholder="A short, step-by-step method."></textarea>
+        <p class="field-error" id="error-instructions"></p>
+      </div>
+
+      <div class="field" id="field-cost">
+        <label for="cost">Cost</label>
+        <div class="cost-input-wrap">
+          <span class="currency-symbol" id="currency-symbol">£</span>
+          <input type="number" id="cost" name="cost" min="0.01" max="999999" step="0.01" required placeholder="0.00">
+        </div>
+        <p class="field-error" id="error-cost"></p>
+      </div>
+
+      <div class="field checkbox-field" id="field-vegetarian">
+        <input type="checkbox" id="vegetarian" name="vegetarian">
+        <label for="vegetarian">This meal is vegetarian <span class="veg-marker" title="Vegetarian">*</span></label>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="stamp-btn" id="add-meal-submit">Add recipe</button>
+        <button type="button" class="secondary-btn" id="reset-form-btn">Clear form</button>
+      </div>
+    </form>
+
+    <section class="community-section">
+      <h2>Recipes added by members</h2>
+      <p class="form-intro">Newest first. You can delete your own recipes.</p>
+      <ul class="community-list" id="community-list"></ul>
+    </section>
+  </div>
 
   <footer class="site-footer">
-    <p>This page only puts your request together &mdash; it isn't live until whoever manages this site adds it. Head back to <a href="index.html">Plan the week</a> to use the live planner.</p>
+    <p>Recipes you add appear in the planner for every visitor. Head back to <a href="index.html">Plan the week</a> to use them.</p>
     <div class="footer-links">
       <a href="index.html">&larr; Plan the week</a>
     </div>
@@ -1018,54 +1008,38 @@ textarea:focus-visible {
 
 <script>
 /* ===========================================================
-   Add Options — admin page logic
-   Loads meals.json and recipes.json (cost lives inside each recipe),
-   password-gates additions, validates the form, then renders updated
-   JSON ready to copy/download.
+   Add a recipe — members only
+   Redirects to login.html if nobody is signed in. Saves straight into
+   the Supabase meal_recipes table; Row Level Security makes sure the
+   recipe is recorded against the signed-in user.
 =========================================================== */
 
-/* SHA-256 hash of the admin password — never store the plain password
-   here. Default password is "mealprep2026". To change it, open the
-   browser console on this page and run:
-     crypto.subtle.digest('SHA-256', new TextEncoder().encode('yourNewPassword'))
-       .then(b => console.log(Array.from(new Uint8Array(b))
-         .map(x => x.toString(16).padStart(2, '0')).join('')))
-   then paste the printed hash in below. Remember: this only deters
-   casual visitors on a public static site, it is not real security. */
-const PASSWORD_HASH = "5f8dcfda335af1428c5bdf535e009254eaa10fabde9888226c835b5bcf5a4263";
-
 const CURRENCY_SYMBOLS = { GBP: "£", USD: "$", EUR: "€" };
+const TYPE_LABELS = { breakfast: "Breakfast", lunch: "Lunch", dinner: "Dinner" };
 
-let workingMeals = null;
-let workingRecipes = null;
-let pendingAdditions = [];
+let currentUser = null;
+// Names already used by the built-in JSON meals, per type (lower-cased).
+const builtInNames = { breakfast: new Set(), lunch: new Set(), dinner: new Set() };
 
 /* ---------- Helpers ---------- */
 
-async function sha256Hex(text) {
-  const enc = new TextEncoder().encode(text);
-  const buf = await crypto.subtle.digest("SHA-256", enc);
-  return Array.from(new Uint8Array(buf))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
-function setFieldError(fieldId, errorId, message) {
-  const field = document.getElementById(fieldId);
-  const errorEl = document.getElementById(errorId);
-  if (message) {
-    field.classList.add("has-error");
-    errorEl.textContent = message;
-  } else {
-    field.classList.remove("has-error");
-    errorEl.textContent = "";
-  }
+function setFieldError(key, message) {
+  const field = document.getElementById(`field-${key}`);
+  const errorEl = document.getElementById(`error-${key}`);
+  field.classList.toggle("has-error", !!message);
+  errorEl.textContent = message || "";
 }
 
 function clearAllErrors() {
-  ["password", "name", "ingredients", "instructions", "cost"].forEach((key) =>
-    setFieldError(`field-${key}`, `error-${key}`, "")
-  );
+  ["type", "name", "ingredients", "instructions", "cost"].forEach((k) => setFieldError(k, ""));
 }
 
 function showBanner(type, message) {
@@ -1081,38 +1055,27 @@ function clearBanner() {
   document.getElementById("form-banner-area").innerHTML = "";
 }
 
-/* ---------- Data loading ---------- */
+/* ---------- Built-in data (for the currency + duplicate check) ---------- */
 
-async function loadData() {
-  const files = [
-    { path: "data/meals.json", key: "meals" },
-    { path: "data/recipes.json", key: "recipes" },
-  ];
+async function loadBuiltIns() {
+  const get = (path) =>
+    fetch(path, { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .catch(() => null);
 
-  const responses = await Promise.all(
-    files.map((f) => fetch(f.path, { cache: "no-store" }).catch((err) => ({ ok: false, _networkError: err })))
-  );
+  const [meals, recipes, lunch, breakfast] = await Promise.all([
+    get("data/meals.json"),
+    get("data/recipes.json"),
+    get("data/lunch.json"),
+    get("data/breakfast.json"),
+  ]);
 
-  const failed = files.filter((f, i) => !responses[i].ok);
-  if (failed.length > 0) {
-    const names = failed.map((f) => f.path).join(", ");
-    throw new Error(
-      `Couldn't load: ${names}. Make sure these files exist in a "data" folder ` +
-      `next to add.html (data/meals.json, data/recipes.json), with those exact ` +
-      `names and capitalisation.`
-    );
-  }
+  if (meals && Array.isArray(meals.meals)) meals.meals.forEach((n) => builtInNames.dinner.add(n.toLowerCase()));
+  if (lunch && lunch.items) Object.keys(lunch.items).forEach((n) => builtInNames.lunch.add(n.toLowerCase()));
+  if (breakfast && breakfast.items) Object.keys(breakfast.items).forEach((n) => builtInNames.breakfast.add(n.toLowerCase()));
 
-  const [mealsRes, recipesRes] = responses;
-  workingMeals = await mealsRes.json();
-  workingRecipes = await recipesRes.json();
-
-  if (!Array.isArray(workingMeals.meals)) workingMeals.meals = [];
-  if (typeof workingRecipes.recipes !== "object" || !workingRecipes.recipes) workingRecipes.recipes = {};
-  if (!workingRecipes.currency) workingRecipes.currency = "GBP";
-
-  const symbol = CURRENCY_SYMBOLS[workingRecipes.currency] || "";
-  document.getElementById("currency-symbol").textContent = symbol;
+  const currency = (recipes && recipes.currency) || "GBP";
+  document.getElementById("currency-symbol").textContent = CURRENCY_SYMBOLS[currency] || "";
 }
 
 /* ---------- Ingredient rows ---------- */
@@ -1125,6 +1088,7 @@ function createIngredientRow(value) {
   input.type = "text";
   input.className = "ingredient-input";
   input.placeholder = "e.g. 250g spaghetti";
+  input.maxLength = 150;
   if (value) input.value = value;
 
   const removeBtn = document.createElement("button");
@@ -1144,8 +1108,7 @@ function addIngredientRow(value) {
 }
 
 function resetIngredientRows() {
-  const wrap = document.getElementById("ingredient-rows");
-  wrap.innerHTML = "";
+  document.getElementById("ingredient-rows").innerHTML = "";
   addIngredientRow();
   addIngredientRow();
 }
@@ -1156,81 +1119,104 @@ async function validateForm() {
   clearAllErrors();
   let valid = true;
 
-  const passwordEl = document.getElementById("password");
-  const nameEl = document.getElementById("meal-name");
-  const instructionsEl = document.getElementById("instructions");
-  const costEl = document.getElementById("cost");
-  const vegetarianEl = document.getElementById("vegetarian");
-
-  const password = passwordEl.value;
-  const name = nameEl.value.trim();
+  const typeEl = document.querySelector('input[name="meal-type"]:checked');
+  const mealType = typeEl ? typeEl.value : "";
+  const name = document.getElementById("meal-name").value.trim();
   const ingredients = Array.from(document.querySelectorAll(".ingredient-input"))
     .map((i) => i.value.trim())
     .filter(Boolean);
-  const instructions = instructionsEl.value.trim();
-  const costRaw = costEl.value;
+  const instructions = document.getElementById("instructions").value.trim();
+  const costRaw = document.getElementById("cost").value;
   const cost = parseFloat(costRaw);
-  const vegetarian = vegetarianEl.checked;
+  const vegetarian = document.getElementById("vegetarian").checked;
 
-  if (!password) {
-    setFieldError("field-password", "error-password", "Enter the shared password.");
+  if (!mealType) {
+    setFieldError("type", "Choose breakfast, lunch or dinner.");
     valid = false;
-  } else {
-    const hash = await sha256Hex(password);
-    if (hash !== PASSWORD_HASH) {
-      setFieldError("field-password", "error-password", "Incorrect password.");
-      valid = false;
-    }
   }
 
   if (!name) {
-    setFieldError("field-name", "error-name", "Enter a meal name.");
+    setFieldError("name", "Enter a meal name.");
     valid = false;
-  } else if (workingMeals.meals.some((m) => m.toLowerCase() === name.toLowerCase())) {
-    setFieldError("field-name", "error-name", "A meal with this name already exists — choose a different name.");
+  } else if (mealType && builtInNames[mealType].has(name.toLowerCase())) {
+    setFieldError("name", `A ${mealType} with this name already exists — choose a different name.`);
     valid = false;
   }
 
   if (ingredients.length === 0) {
-    setFieldError("field-ingredients", "error-ingredients", "Add at least one ingredient.");
+    setFieldError("ingredients", "Add at least one ingredient.");
     valid = false;
   }
 
   if (!instructions) {
-    setFieldError("field-instructions", "error-instructions", "Add a short method.");
+    setFieldError("instructions", "Add a short method.");
     valid = false;
   }
 
   if (costRaw === "" || isNaN(cost) || cost <= 0) {
-    setFieldError("field-cost", "error-cost", "Enter a cost greater than 0.");
+    setFieldError("cost", "Enter a cost greater than 0.");
     valid = false;
   }
 
-  return { valid, name, ingredients, instructions, cost: Math.round(cost * 100) / 100, vegetarian };
+  return { valid, mealType, name, ingredients, instructions, cost: Math.round(cost * 100) / 100, vegetarian };
 }
 
-/* ---------- Output rendering ---------- */
+/* ---------- Community list ---------- */
 
-function renderOutputs() {
-  document.getElementById("output-meals").textContent = JSON.stringify(workingMeals, null, 2);
-  document.getElementById("output-recipes").textContent = JSON.stringify(workingRecipes, null, 2);
-  document.getElementById("output-section").hidden = false;
-}
+async function loadCommunityList() {
+  const list = document.getElementById("community-list");
+  const { data, error } = await sb
+    .from("meal_recipes")
+    .select("id, name, meal_type, vegetarian, cost, user_id, created_at, meal_profiles(display_name)")
+    .order("created_at", { ascending: false })
+    .limit(100);
 
-function renderPendingList() {
-  const el = document.getElementById("pending-list");
-  if (pendingAdditions.length === 0) {
-    el.hidden = true;
+  if (error) {
+    console.error(error);
+    list.innerHTML = '<li class="community-empty">Couldn\'t load the list of recipes.</li>';
     return;
   }
-  el.hidden = false;
-  const names = pendingAdditions
-    .map((item) => {
-      const safeName = item.name.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      return item.vegetarian ? `${safeName}<span class="veg-marker" title="Vegetarian">*</span>` : safeName;
-    })
-    .join(", ");
-  el.innerHTML = `<strong>In this request so far:</strong> ${names}`;
+
+  if (!data || data.length === 0) {
+    list.innerHTML = '<li class="community-empty">No recipes have been added yet. Yours could be the first.</li>';
+    return;
+  }
+
+  list.innerHTML = "";
+  data.forEach((row) => {
+    const author = (row.meal_profiles && row.meal_profiles.display_name) || "a former member";
+    const when = new Date(row.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+
+    const li = document.createElement("li");
+    li.className = "community-item";
+    li.innerHTML = `
+      <div>
+        <div class="ci-name">${escapeHtml(row.name)}${row.vegetarian ? '<span class="veg-marker" title="Vegetarian">*</span>' : ""}</div>
+        <div class="ci-meta">${TYPE_LABELS[row.meal_type] || row.meal_type} &middot; added by ${escapeHtml(author)} &middot; ${when}</div>
+      </div>`;
+
+    if (row.user_id && row.user_id === currentUser.id) {
+      const del = document.createElement("button");
+      del.type = "button";
+      del.className = "tiny-btn";
+      del.textContent = "Delete";
+      del.addEventListener("click", () => deleteRecipe(row));
+      li.appendChild(del);
+    }
+    list.appendChild(li);
+  });
+}
+
+async function deleteRecipe(row) {
+  if (!window.confirm(`Delete "${row.name}" for everyone? This can't be undone.`)) return;
+  const { error } = await sb.from("meal_recipes").delete().eq("id", row.id);
+  if (error) {
+    console.error(error);
+    showBanner("error", "Couldn't delete that recipe. Try signing in again.");
+    return;
+  }
+  showBanner("success", `"${row.name}" was deleted.`);
+  loadCommunityList();
 }
 
 /* ---------- Form submit ---------- */
@@ -1240,122 +1226,77 @@ async function handleSubmit(e) {
   clearBanner();
 
   const submitBtn = document.getElementById("add-meal-submit");
-  submitBtn.disabled = true;
-
   const result = await validateForm();
 
-  submitBtn.disabled = false;
-
   if (!result.valid) {
-    showBanner("error", "Please fix the errors below before adding this meal.");
+    showBanner("error", "Please fix the errors below before adding this recipe.");
     return;
   }
 
-  workingMeals.meals.push(result.name);
-  workingRecipes.recipes[result.name] = {
+  submitBtn.disabled = true;
+  const { error } = await sb.from("meal_recipes").insert({
+    meal_type: result.mealType,
+    name: result.name,
     ingredients: result.ingredients,
     instructions: result.instructions,
     vegetarian: result.vegetarian,
     cost: result.cost,
-  };
-  pendingAdditions.push({ name: result.name, vegetarian: result.vegetarian });
+  });
+  submitBtn.disabled = false;
 
-  renderOutputs();
-  renderPendingList();
-  showBanner("success", `"${result.name}" was added to your request below. Copy or download it and send it to whoever manages the site to make it live.`);
+  if (error) {
+    console.error(error);
+    if (error.code === "23505") {
+      setFieldError("name", `A ${result.mealType} with this name already exists — choose a different name.`);
+      showBanner("error", "That name is already taken for this meal type.");
+    } else if (error.code === "42501" || /row-level security/i.test(error.message || "")) {
+      showBanner("error", "You're not allowed to add recipes. Try signing out and back in.");
+    } else {
+      showBanner("error", "Couldn't save the recipe. Check your connection and try again.");
+    }
+    return;
+  }
 
-  document.getElementById("meal-name").value = "";
-  document.getElementById("instructions").value = "";
-  document.getElementById("cost").value = "";
-  document.getElementById("password").value = "";
-  document.getElementById("vegetarian").checked = false;
+  showBanner("success", `"${result.name}" was added to the planner for everyone.`);
+  resetForm(false);
+  loadCommunityList();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function resetForm(clearBannerToo) {
+  document.getElementById("add-meal-form").reset();
   resetIngredientRows();
   clearAllErrors();
-
-  document.getElementById("output-section").scrollIntoView({ behavior: "smooth", block: "start" });
+  if (clearBannerToo) clearBanner();
 }
 
-/* ---------- Start over ---------- */
+/* ---------- Start up ---------- */
 
-async function handleStartOver() {
-  const confirmed = window.confirm(
-    "This will discard any meals you've added this session and reload the original files. Continue?"
-  );
-  if (!confirmed) return;
-
-  const status = document.getElementById("add-meal-submit");
-  status.disabled = true;
-  try {
-    await loadData();
-    pendingAdditions = [];
-    document.getElementById("output-section").hidden = true;
-    document.getElementById("pending-list").hidden = true;
-    document.getElementById("add-meal-form").reset();
-    resetIngredientRows();
-    clearAllErrors();
-    clearBanner();
-  } catch (err) {
-    console.error(err);
-    showBanner("error", "Couldn't reload the data files. Check your connection and try again.");
-  }
-  status.disabled = false;
-}
-
-/* ---------- Copy / download ---------- */
-
-async function handleOutputClick(e) {
-  const copyId = e.target.getAttribute("data-copy");
-  const downloadName = e.target.getAttribute("data-download");
-
-  if (copyId) {
-    const text = document.getElementById(copyId).textContent;
-    try {
-      await navigator.clipboard.writeText(text);
-      const original = e.target.textContent;
-      e.target.textContent = "Copied!";
-      setTimeout(() => (e.target.textContent = original), 1500);
-    } catch (err) {
-      console.error("Clipboard copy failed", err);
-    }
+async function init() {
+  if (!sb) {
+    document.getElementById("config-warning").hidden = false;
+    return;
   }
 
-  if (downloadName) {
-    const sourceId = e.target.getAttribute("data-source");
-    const text = document.getElementById(sourceId).textContent;
-    const blob = new Blob([text], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = downloadName;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  currentUser = await getCurrentUser();
+  if (!currentUser) {
+    location.replace("login.html?next=add.html");
+    return;
   }
-}
 
-/* ---------- Wiring ---------- */
-
-document.addEventListener("DOMContentLoaded", async () => {
+  document.getElementById("add-view").hidden = false;
+  renderAuthNav("add");
   resetIngredientRows();
 
-  try {
-    await loadData();
-  } catch (err) {
-    console.error(err);
-    const detail = err && err.message ? err.message : "Couldn't load the data files, so a request can't be put together right now.";
-    const suffix = location.protocol === "file:"
-      ? " This page was opened directly from disk — serve it over http(s):// instead (e.g. GitHub Pages, or `python3 -m http.server` locally)."
-      : "";
-    showBanner("error", detail + suffix);
-    document.getElementById("add-meal-submit").disabled = true;
-  }
-
-  document.getElementById("add-ingredient-btn").addEventListener("click", () => addIngredientRow());
   document.getElementById("add-meal-form").addEventListener("submit", handleSubmit);
-  document.getElementById("reset-form-btn").addEventListener("click", handleStartOver);
-  document.getElementById("output-section").addEventListener("click", handleOutputClick);
-});
+  document.getElementById("add-ingredient-btn").addEventListener("click", () => addIngredientRow());
+  document.getElementById("reset-form-btn").addEventListener("click", () => resetForm(true));
+
+  await loadBuiltIns();
+  await loadCommunityList();
+}
+
+document.addEventListener("DOMContentLoaded", init);
 </script>
 </body>
 </html>

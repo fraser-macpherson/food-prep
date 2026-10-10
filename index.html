@@ -995,7 +995,147 @@ textarea:focus-visible {
   .planner-actions { flex-direction: column; align-items: stretch; }
   .form-card { padding: 20px; }
   .site-footer { flex-direction: column; }
-}</style>
+}
+/* ---------- Sign-in / nav auth ---------- */
+.nav-auth {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.nav-user {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--ink-soft);
+  padding: 0 8px;
+}
+
+button.nav-link {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.added-by {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+  margin: -4px 0 0;
+}
+
+.field input[type="email"] {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 11px 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 9px;
+  background: #fff;
+  color: var(--ink);
+  width: 100%;
+}
+
+.field input[type="email"]:focus { border-color: var(--accent); }
+.field.has-error input { border-color: var(--error); }
+
+.type-options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.field label.type-option {
+  position: relative;
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.type-option input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.type-option span {
+  display: inline-block;
+  padding: 10px 22px;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+}
+
+.type-option input:checked + span {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.type-option input:focus-visible + span {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.community-section { max-width: 640px; }
+
+.community-section h2 {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  margin: 0 0 6px;
+}
+
+.community-list {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.community-item {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.community-item .ci-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.community-item .ci-meta {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+
+.community-empty {
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.login-card { margin-top: 0; }
+
+.nav-user, .nav-auth .nav-link { white-space: nowrap; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="supabase-config.js"></script>
 </head>
 <body>
 
@@ -1005,7 +1145,7 @@ textarea:focus-visible {
     <a href="index.html" class="nav-logo">Weekly Meal Plan</a>
     <div class="nav-links">
       <a href="index.html" class="nav-link is-active" aria-current="page">Plan the week</a>
-      <a href="add.html" class="nav-link">Add options</a>
+      <span class="nav-auth" id="auth-nav"></span>
     </div>
   </nav>
 
@@ -1075,9 +1215,9 @@ textarea:focus-visible {
   </section>
 
   <footer class="site-footer">
-    <p>Want to see a new meal added to the list? Head to <a href="add.html">Add options</a>, fill in the form, and send what it gives you to whoever manages this site to request the addition.</p>
+    <p>Have a breakfast, lunch or dinner to share? Sign in and add it &mdash; it shows up in the planner for everyone, with your name on it.</p>
     <div class="footer-links">
-      <a href="add.html">Add options &rarr;</a>
+      <a href="add.html">Add a recipe &rarr;</a>
     </div>
   </footer>
 
@@ -1205,6 +1345,8 @@ async function loadData() {
     state.lunchItems = lunchJson.items || {};
     state.breakfastItems = breakfastJson.items || {};
 
+    await mergeCommunityRecipes();
+
     if (state.meals.length === 0) {
       status.textContent = "No meals found in data/meals.json — add some meal names to get started.";
     }
@@ -1219,6 +1361,57 @@ async function loadData() {
       status.textContent = err && err.message ? err.message : "Couldn't load the meal data.";
     }
   }
+}
+
+/* ---------- Community recipes (from Supabase) ---------- */
+
+// Recipes added through the website live in the meal_recipes table. They are
+// merged into the same lists the JSON files fill, so the dropdowns, recipe
+// cards and shopping list treat them exactly like built-in meals. Each one
+// also carries `addedBy` so the cards can say who added it.
+async function mergeCommunityRecipes() {
+  if (!sb) return;
+  try {
+    const { data, error } = await sb
+      .from("meal_recipes")
+      .select("name, meal_type, ingredients, instructions, vegetarian, cost, created_at, meal_profiles(display_name)")
+      .order("created_at", { ascending: true });
+    if (error) throw error;
+
+    (data || []).forEach((row) => {
+      const author = (row.meal_profiles && row.meal_profiles.display_name) || "a former member";
+      const entry = {
+        ingredients: Array.isArray(row.ingredients) ? row.ingredients : [],
+        instructions: row.instructions || "",
+        vegetarian: row.vegetarian === true,
+        cost: Number(row.cost),
+        addedBy: author,
+      };
+
+      const target =
+        row.meal_type === "dinner" ? state.recipes
+        : row.meal_type === "breakfast" ? state.breakfastItems
+        : state.lunchItems;
+
+      // If a built-in meal already uses this name, keep both by tagging the new one.
+      let key = row.name;
+      if (target[key]) key = `${row.name} (by ${author})`;
+      if (target[key]) return;
+
+      target[key] = entry;
+      if (row.meal_type === "dinner") state.meals.push(key);
+    });
+  } catch (err) {
+    console.warn("Couldn't load community recipes:", err);
+    const status = document.getElementById("planner-status");
+    if (status) status.textContent = "Couldn't load recipes added by members — showing the built-in ones.";
+  }
+}
+
+function addedByHtml(entry) {
+  return entry && entry.addedBy
+    ? `<p class="added-by">Added by ${escapeHtml(entry.addedBy)}</p>`
+    : "";
 }
 
 /* ---------- Planner view ---------- */
@@ -1424,6 +1617,7 @@ function renderDailyBreakdown(selections) {
     card.innerHTML = `
       <div class="day-label">${sel.label}</div>
       <h3 class="meal-name">${escapeHtml(sel.dinner)}${isVegetarian(sel.dinner) ? vegMarkerHtml() : ""}</h3>
+      ${addedByHtml(recipe)}
       <div class="meal-cost">${formatMoney(cost)}</div>
       ${instructionsHtml}
       ${ingredientsHtml}
@@ -1482,6 +1676,7 @@ function renderExtraBreakdown(kind, picks) {
     card.innerHTML = `
       <div class="day-label">${typeLabel} ${idx + 1}</div>
       <h3 class="meal-name">${escapeHtml(name)}${vegFn(name) ? vegMarkerHtml() : ""}</h3>
+      ${addedByHtml(item)}
       <div class="meal-cost">${formatMoney(cost)}</div>
       ${instructionsHtml}
       ${ingredientsHtml}
@@ -1715,6 +1910,7 @@ function showPlanner() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  renderAuthNav("home");
   await loadData();
   buildDayCards();
   renderMealListRows("breakfast");
