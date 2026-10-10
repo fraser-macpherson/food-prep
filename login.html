@@ -1017,7 +1017,7 @@ async function handleLogin(e) {
     } else if (error.status === 400 || /invalid login/i.test(error.message || "")) {
       showBanner("error", "That email and password don't match an account.");
     } else {
-      showBanner("error", "Couldn't sign in. Check your connection and try again.");
+      showBanner("error", "Couldn't sign in: " + (error.message || "unknown error") + (error.status ? " (status " + error.status + ")" : ""));
     }
     return;
   }
