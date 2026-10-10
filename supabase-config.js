@@ -10,17 +10,17 @@
    NEVER put the service_role / secret key in this file.
 =========================================================== */
 
-const SUPABASE_URL = "https://YOUR-PROJECT-REF.supabase.co";
-const SUPABASE_ANON_KEY = "YOUR-ANON-OR-PUBLISHABLE-KEY";
+const SUPABASE_URL = "https://udmvwhciwhkxibhrfput.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_fE36kTeib4uDBLyJnqcw2w_yEFX-VxV";
 
 const supabaseConfigured =
-  !SUPABASE_URL.includes("https://udmvwhciwhkxibhrfput.supabase.co") && !SUPABASE_ANON_KEY.startsWith("sb_publishable_fE36kTeib4uDBLyJnqcw2w_yEFX-VxV");
+  !SUPABASE_URL.includes("YOUR-PROJECT-REF") && !SUPABASE_ANON_KEY.startsWith("YOUR-");
 
 // `sb` is null until the two values above are filled in, so the planner
 // still works (using just the JSON files) while you're setting things up.
 const sb =
   supabaseConfigured && window.supabase
-    ? window.supabase.createClient(https://udmvwhciwhkxibhrfput.supabase.co, sb_publishable_fE36kTeib4uDBLyJnqcw2w_yEFX-VxV, {
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
         auth: { persistSession: true, autoRefreshToken: true },
       })
     : null;
