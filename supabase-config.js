@@ -20,7 +20,7 @@ const supabaseConfigured =
 // still works (using just the JSON files) while you're setting things up.
 const sb =
   supabaseConfigured && window.supabase
-    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    ? window.supabase.createClient(https://udmvwhciwhkxibhrfput.supabase.co, sb_publishable_fE36kTeib4uDBLyJnqcw2w_yEFX-VxV, {
         auth: { persistSession: true, autoRefreshToken: true },
       })
     : null;
