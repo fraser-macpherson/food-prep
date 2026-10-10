@@ -14,7 +14,7 @@ const SUPABASE_URL = "https://YOUR-PROJECT-REF.supabase.co";
 const SUPABASE_ANON_KEY = "YOUR-ANON-OR-PUBLISHABLE-KEY";
 
 const supabaseConfigured =
-  !SUPABASE_URL.includes("YOUR-PROJECT-REF") && !SUPABASE_ANON_KEY.startsWith("YOUR-");
+  !SUPABASE_URL.includes("https://udmvwhciwhkxibhrfput.supabase.co") && !SUPABASE_ANON_KEY.startsWith("sb_publishable_fE36kTeib4uDBLyJnqcw2w_yEFX-VxV");
 
 // `sb` is null until the two values above are filled in, so the planner
 // still works (using just the JSON files) while you're setting things up.
